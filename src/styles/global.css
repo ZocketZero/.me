@@ -62,7 +62,7 @@
   }
 
   header {
-    @apply fixed left-0 right-0 top-0 z-50 py-4;
+    @apply left-0 right-0 top-0 z-50 py-4;
     @apply bg-white/80 dark:bg-neutral-950/80;
     @apply saturate-150 backdrop-blur-md;
     @apply border-b border-neutral-200/50 dark:border-neutral-800/50;
