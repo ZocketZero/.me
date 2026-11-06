@@ -22,11 +22,13 @@ const {
 <a
   href={href}
   target={external ? "_blank" : "_self"}
+  rel={external ? "noopener noreferrer" : undefined}
   class={cn(
     "inline-block transition-colors duration-300 ease-in-out",
-    underline && "underline underline-offset-[3px] decoration-black/30 dark:decoration-white/30 hover:decoration-black/50 dark:hover:decoration-white/50",
+    underline &&
+      "underline underline-offset-[3px] decoration-black/30 dark:decoration-white/30 hover:decoration-black/50 dark:hover:decoration-white/50",
     group && "group",
-    className
+    className,
   )}
   {...rest}
 >

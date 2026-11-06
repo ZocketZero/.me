@@ -1,10 +1,32 @@
 ---
 import { getCollection } from "astro:content";
 
-const allPosts = await getCollection("blog");
-const allTags = allPosts.map((tag) => tag.data.tags).flat();
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+const tagCounts = new Map<string, number>();
 
-console.log(allTags);
+for (const post of posts) {
+  if (post.data.tags) {
+    for (const tag of post.data.tags) {
+      tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+    }
+  }
+}
+
+const tags = Array.from(tagCounts.keys()).sort();
 ---
 
-<span> </span>
+<div class="flex flex-wrap gap-2">
+  {
+    tags.map((tag) => (
+      <a
+        href={`/tags/${tag}`}
+        class="rounded-sm border border-black/15 px-2 py-1 text-sm transition-colors duration-300 ease-in-out hover:bg-black/5 hover:text-black focus-visible:bg-black/5 focus-visible:text-black dark:border-white/20 dark:hover:bg-white/5 dark:hover:text-white dark:focus-visible:bg-white/5 dark:focus-visible:text-white"
+      >
+        {tag}{" "}
+        <span class="text-sm text-neutral-500 dark:text-neutral-400">
+          ({tagCounts.get(tag) ?? 0})
+        </span>
+      </a>
+    ))
+  }
+</div>

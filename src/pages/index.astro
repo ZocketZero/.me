@@ -6,29 +6,26 @@ import ArrowCard from "@components/ArrowCard.astro";
 import Link from "@components/Link.astro";
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
-import Welcome from '@components/Welcome.astro'
+import Welcome from "@components/Welcome.astro";
 
-const blog = (await getCollection("blog"))
-  .filter((post) => !post.data.draft)
+const blog = (await getCollection("blog", ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, SITE.NUM_POSTS_ON_HOMEPAGE);
 
 const projects: CollectionEntry<"projects">[] = (
-  await getCollection("projects")
+  await getCollection("projects", ({ data }) => !data.draft)
 )
-  .filter((project) => !project.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, SITE.NUM_PROJECTS_ON_HOMEPAGE);
 ---
 
 <Layout title={HOME.TITLE} description={HOME.DESCRIPTION}>
   <Container>
-    <aside data-pagefind-ignore>
-      <h1 class="font-semibold text-black dark:text-white text-center py-3">
+    <div data-pagefind-ignore>
+      <h1 class="py-3 text-center font-semibold text-black dark:text-white">
         Hello, friend !
       </h1>
       <div class="space-y-16">
-
         <Welcome />
 
         <section class="animate space-y-6">
@@ -103,6 +100,6 @@ const projects: CollectionEntry<"projects">[] = (
           </ul>
         </section>
       </div>
-    </aside>
+    </div>
   </Container>
 </Layout>

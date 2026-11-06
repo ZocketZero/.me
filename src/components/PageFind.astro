@@ -2,15 +2,14 @@
 import Search from "astro-pagefind/components/Search.astro";
 ---
 
-<aside id="search-box" class="hidden" data-pagefind-ignore>
+<aside id="search-box" transition:persist class="hidden" data-pagefind-ignore>
   <div
-    transition:persist
     id="backdrop"
     class="bg-[rgba(0, 0, 0, 0.5)] fixed top-0 left-0 z-50 flex h-screen w-full justify-center p-6 backdrop-blur-xs"
   >
     <div
       id="pagefind-container"
-      class="overflow-visible m-0 flex h-fit max-h-[80%] w-full max-w-(--breakpoint-sm) flex-col rounded-sm border border-black/15 bg-neutral-100 p-2 px-4 py-3 shadow-lg dark:border-white/20 dark:bg-neutral-900"
+      class="m-0 flex h-fit max-h-[80%] w-full max-w-(--breakpoint-sm) flex-col overflow-visible rounded-sm border border-black/15 bg-neutral-100 p-2 px-4 py-3 shadow-lg dark:border-white/20 dark:bg-neutral-900"
     >
       <div id="search">
         <Search
@@ -33,66 +32,67 @@ import Search from "astro-pagefind/components/Search.astro";
 </aside>
 
 <script is:inline>
-  const magnifyingGlass = document.getElementById("magnifying-glass");
-  const backdrop = document.getElementById("backdrop");
-  const searchBox = document.getElementById("search-box")
-
-  function openPagefind() {
-    const searchDiv = document.getElementById("search");
-    const search = searchDiv.querySelector("input");
-    setTimeout(() => {
-      search.focus();
-    }, 0);
-    searchBox.classList.remove('hidden')
-  }
-
-  function closePagefind() {
-    const searchDiv = document.getElementById("search");
-    const search = searchDiv.querySelector("input");
-    search.value = "";
-    searchBox.classList.add('hidden')
-  }
-
-  // open pagefind
-  magnifyingGlass?.addEventListener("click", () => {
-    openPagefind();
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "/") {
-      e.preventDefault();
-      openPagefind();
-    } else if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-      e.preventDefault();
-      openPagefind();
+  (function setupPagefind() {
+    function openPagefind() {
+      const searchBox = document.getElementById("search-box");
+      const searchInput = document.querySelector("#search input");
+      searchBox?.classList.remove("hidden");
+      setTimeout(() => {
+        searchInput?.focus();
+      }, 50);
     }
-  });
 
-  // close pagefind
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      closePagefind();
+    function closePagefind() {
+      const searchBox = document.getElementById("search-box");
+      const searchInput = document.querySelector("#search input");
+      if (searchInput) searchInput.value = "";
+      searchBox?.classList.add("hidden");
     }
-  });
 
-  // close pagefind when searched result(link) clicked
-  document.addEventListener("click", (event) => {
-    if (event.target.classList.contains("pagefind-ui__result-link")) {
-      closePagefind();
-    }
-  });
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
 
-  backdrop?.addEventListener("click", (event) => {
-    if (!event.target.closest("#pagefind-container")) {
-      closePagefind();
-    }
-  });
+      if (target.closest("#magnifying-glass")) {
+        openPagefind();
+        return;
+      }
 
-  // prevent form submission
-  const form = document.getElementById("form");
-  form?.addEventListener("submit", (event) => {
-    event.preventDefault();
-  });
+      if (target.classList.contains("pagefind-ui__result-link")) {
+        closePagefind();
+        return;
+      }
+
+      const backdrop = document.getElementById("backdrop");
+      if (backdrop && target === backdrop) {
+        closePagefind();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      const activeEl = document.activeElement;
+      const isInput =
+        activeEl instanceof HTMLInputElement ||
+        activeEl instanceof HTMLTextAreaElement ||
+        (activeEl instanceof HTMLElement && activeEl.isContentEditable);
+
+      if (e.key === "Escape") {
+        closePagefind();
+      } else if (e.key === "/" && !isInput) {
+        e.preventDefault();
+        openPagefind();
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        openPagefind();
+      }
+    });
+
+    document.addEventListener("submit", (event) => {
+      if (event.target instanceof Element && event.target.closest("#search")) {
+        event.preventDefault();
+      }
+    });
+  })();
 </script>
 
 <style is:global>

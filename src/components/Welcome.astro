@@ -3,44 +3,60 @@ import Link from "./Link.astro";
 ---
 
 <section class="animate">
-  <div class="flex flex-col-reverse md:flex-row gap-8 items-start">
-
-    <div class="relative shrink-0 mx-auto md:mx-0">
-      <div class="absolute -inset-1 rounded-2xl bg-gradient-to-tr from-primary to-emerald-300 opacity-30 blur-xl dark:opacity-20"></div>
+  <div class="flex flex-col-reverse items-start gap-8 md:flex-row">
+    <div class="relative mx-auto shrink-0 md:mx-0">
+      <div
+        class="from-primary absolute -inset-1 rounded-2xl bg-gradient-to-tr to-emerald-300 opacity-30 blur-xl dark:opacity-20"
+      >
+      </div>
       <img
-        class="relative h-48 w-48 md:h-56 md:w-56 rounded-2xl border border-neutral-200 dark:border-neutral-800 object-cover shadow-2xl"
+        class="relative h-48 w-48 rounded-2xl border border-neutral-200 object-cover shadow-2xl md:h-56 md:w-56 dark:border-neutral-800"
         src="https://avatars.githubusercontent.com/u/96001130?v=4"
         alt="Nawasan's profile"
+        width="224"
+        height="224"
+        loading="eager"
+        decoding="async"
       />
     </div>
 
     <div class="flex-1 space-y-6">
-      <h1 class="text-4xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
+      <h1
+        class="text-4xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
+      >
         <span>สวัสดีครับ</span>
-        <span class="my-1"> ผมชื่อ <span class="text-primary dark:text-primary-dark">ณวสันต์</span> </span>
+        <span class="my-1">
+          ผมชื่อ <span class="text-primary dark:text-primary-dark">ณวสันต์</span
+          >
+        </span>
       </h1>
-      
-      <div class="space-y-4 text-lg leading-relaxed text-neutral-700 dark:text-neutral-300">
+
+      <div
+        class="space-y-4 text-lg leading-relaxed text-neutral-700 dark:text-neutral-300"
+      >
         <p>
-          ใน <Link href="/blog">blog</Link> แห่งนี้ ผมรวบรวมความคิดเห็น ประสบการณ์ และความรู้จากการศึกษาค้นคว้า 
-          ซึ่งอาจมีทั้งสิ่งที่ถูกต้องและผิดพลาด จึงขอให้ผู้อ่านใช้วิจารณญาณในการอ่านนะครับ 😄
+          ใน <Link href="/blog">blog</Link> แห่งนี้ ผมรวบรวมความคิดเห็น ประสบการณ์
+          และความรู้จากการศึกษาค้นคว้า ซึ่งอาจมีทั้งสิ่งที่ถูกต้องและผิดพลาด จึงขอให้ผู้อ่านใช้วิจารณญาณในการอ่านนะครับ
+          😄
         </p>
-        
+
         <p>
           และในส่วนของ <Link href="/projects">project</Link> ต่างๆ ที่ผมได้พัฒนาขึ้นมา
-          บางส่วนก็จะสร้างขึ้นมาเพื่อแก้ปัญหาที่ผมเจอในชีวิตประจำวัน
-ซึ่งด้วยผมใช้ <strong>Linux</strong> เป็นหลัก การทดสอบโปรแกรมต่างๆ
-          จึงมักจะเน้นไปที่ระบบปฏิบัติการ Linux เป็นหลัก แม้จะไม่ได้ทดสอบบนระบบปฏิบัติการอื่น
-          แต่ก็หวังเป็นอย่างยิ่งว่ามันจะทำงานได้
+          บางส่วนก็จะสร้างขึ้นมาเพื่อแก้ปัญหาที่ผมเจอในชีวิตประจำวัน ซึ่งด้วยผมใช้
+          <strong>Linux</strong> เป็นหลัก การทดสอบโปรแกรมต่างๆ จึงมักจะเน้นไปที่ระบบปฏิบัติการ
+          Linux เป็นหลัก แม้จะไม่ได้ทดสอบบนระบบปฏิบัติการอื่น แต่ก็หวังเป็นอย่างยิ่งว่ามันจะทำงานได้
         </p>
       </div>
 
       <div class="flex flex-wrap gap-4 pt-2">
-        <Link external href="https://github.com/ZocketZero" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-900 dark:bg-neutral-50 text-white dark:text-neutral-900 font-medium transition-transform hover:scale-105">
+        <Link
+          external
+          href="https://github.com/ZocketZero"
+          class="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 font-medium text-white transition-transform hover:scale-105 dark:bg-neutral-50 dark:text-neutral-900"
+        >
           <span>Follow on GitHub</span>
         </Link>
       </div>
     </div>
-
   </div>
 </section>

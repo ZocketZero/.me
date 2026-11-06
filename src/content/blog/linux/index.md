@@ -91,7 +91,7 @@ Linux ครั้งแรกจาก Ubuntu ซึ่งเป็น Linux Di
 มีความเรียบง่าย ไม่มีอะไรยุ่งยาก ซับซ้อน หรือเกินความจำเป็น
 ### KDE Plasma
 
-![kde-plasma-desktop](./kde.png)
+![kde-plasma-desktop](./kde.webp)
 
 https://kde.org/plasma-desktop/
 

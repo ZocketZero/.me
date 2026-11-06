@@ -19,6 +19,6 @@ repoURL: "https://github.com/ZocketZero/movie-random-react"
 ## 🤖 Tech stack
 
 - React
-- vite js
-- Typescrypt
-- Tailwindcss
+- Vite
+- TypeScript
+- Tailwind CSS
