@@ -6,14 +6,14 @@ import { SITE } from "@consts";
 
 <header transition:persist class="animate">
   <Container>
-    <div class="flex flex-wrap items-center justify-between gap-y-4">
+    <div class="block text-center text-lg sm:flex flex-wrap items-center justify-between gap-y-4">
       <Link href="/" underline={false} class="group">
-        <div class="font-bold text-xl tracking-tighter text-neutral-900 dark:text-neutral-50 transition-colors group-hover:text-primary dark:group-hover:text-primary-dark">
+        <div class="pb-5 sm:pb-0 font-bold text-xl tracking-tighter text-neutral-900 dark:text-neutral-50 transition-colors group-hover:text-primary dark:group-hover:text-primary-dark">
           {SITE.TITLE}&nbsp;<span class="inline-block transition-transform group-hover:rotate-12 group-hover:scale-110">🔬</span>
         </div>
       </Link>
       
-      <nav class="flex items-center gap-2 sm:gap-4 font-medium">
+      <nav class="flex items-center justify-center gap-2 sm:gap-4 font-medium">
         <div class="flex items-center gap-1 sm:gap-2">
           <Link href="/blog" class="px-2 py-1 hover:text-primary dark:hover:text-primary-dark transition-colors">blog</Link>
           <span class="text-neutral-300 dark:text-neutral-700">/</span>
