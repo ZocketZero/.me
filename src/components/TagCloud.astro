@@ -20,11 +20,12 @@ const tags = Array.from(tagCounts.keys()).sort();
     tags.map((tag) => (
       <a
         href={`/tags/${tag}`}
-        class="rounded-sm border border-black/15 px-2 py-1 text-sm transition-colors duration-300 ease-in-out hover:bg-black/5 hover:text-black focus-visible:bg-black/5 focus-visible:text-black dark:border-white/20 dark:hover:bg-white/5 dark:hover:text-white dark:focus-visible:bg-white/5 dark:focus-visible:text-white"
+        class="retro-btn text-xs font-mono flex items-center gap-1.5"
       >
-        {tag}{" "}
-        <span class="text-sm text-neutral-500 dark:text-neutral-400">
-          ({tagCounts.get(tag) ?? 0})
+        <span>🏷️</span>
+        <span class="font-bold">{tag}</span>
+        <span class="px-1 py-0.2 bg-[#d0cdc4] dark:bg-[#020617] border border-[#808080] text-[10px] text-neutral-600 dark:text-neutral-400">
+          {tagCounts.get(tag) ?? 0}
         </span>
       </a>
     ))

@@ -2,34 +2,21 @@
 const { prevPost, nextPost } = Astro.props;
 ---
 
-<div class="grid grid-cols-2 gap-1.5 sm:gap-3">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 select-none">
   {
     prevPost?.id ? (
       <a
         href={`/blog/${prevPost?.id}`}
-        class="group relative flex flex-nowrap rounded-lg border border-black/15 px-4 py-3 pl-10 no-underline transition-colors duration-300 ease-in-out hover:bg-black/5 hover:text-black focus-visible:bg-black/5 focus-visible:text-black dark:border-white/20 dark:hover:bg-white/5 dark:hover:text-white dark:focus-visible:bg-white/5 dark:focus-visible:text-white"
+        class="retro-bevel bg-[#e4e0d8] dark:bg-[#1e293b] hover:bg-[#ffffe0] dark:hover:bg-[#27354f] p-2.5 flex items-center gap-2 no-underline text-xs sm:text-sm font-heading"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          class="absolute left-2 top-1/2 size-5 -translate-y-1/2 fill-none stroke-current stroke-2"
-        >
-          <line
-            x1="5"
-            y1="12"
-            x2="19"
-            y2="12"
-            class="translate-x-3 scale-x-0 transition-transform duration-300 ease-in-out group-hover:translate-x-0 group-hover:scale-x-100 group-focus-visible:translate-x-0 group-focus-visible:scale-x-100"
-          />
-          <polyline
-            points="12 5 5 12 12 19"
-            class="translate-x-1 transition-transform duration-300 ease-in-out group-hover:translate-x-0 group-focus-visible:translate-x-0"
-          />
-        </svg>
-        <div class="flex items-center text-sm">{prevPost?.data.title}</div>
+        <span class="text-base">◀</span>
+        <div class="truncate">
+          <div class="text-[10px] font-mono text-neutral-500 uppercase font-bold">Previous Article</div>
+          <div class="font-bold text-[#0000cc] dark:text-[#38bdf8] truncate">{prevPost?.data.title}</div>
+        </div>
       </a>
     ) : (
-      <div class="invisible" />
+      <div class="hidden sm:block" />
     )
   }
 
@@ -37,29 +24,16 @@ const { prevPost, nextPost } = Astro.props;
     nextPost?.id ? (
       <a
         href={`/blog/${nextPost?.id}`}
-        class="group relative flex grow flex-row-reverse flex-nowrap rounded-lg border border-black/15 px-4 py-4 pr-10 no-underline transition-colors duration-300 ease-in-out hover:bg-black/5 hover:text-black focus-visible:bg-black/5 focus-visible:text-black dark:border-white/20 dark:hover:bg-white/5 dark:hover:text-white dark:focus-visible:bg-white/5 dark:focus-visible:text-white"
+        class="retro-bevel bg-[#e4e0d8] dark:bg-[#1e293b] hover:bg-[#ffffe0] dark:hover:bg-[#27354f] p-2.5 flex items-center justify-end gap-2 text-right no-underline text-xs sm:text-sm font-heading"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          class="absolute right-2 top-1/2 size-5 -translate-y-1/2 fill-none stroke-current stroke-2"
-        >
-          <line
-            x1="5"
-            y1="12"
-            x2="19"
-            y2="12"
-            class="translate-x-3 scale-x-0 transition-transform duration-300 ease-in-out group-hover:translate-x-0 group-hover:scale-x-100 group-focus-visible:translate-x-0 group-focus-visible:scale-x-100"
-          />
-          <polyline
-            points="12 5 19 12 12 19"
-            class="-translate-x-1 transition-transform duration-300 ease-in-out group-hover:translate-x-0 group-focus-visible:translate-x-0"
-          />
-        </svg>
-        <div class="flex items-center text-sm">{nextPost?.data.title}</div>
+        <div class="truncate">
+          <div class="text-[10px] font-mono text-neutral-500 uppercase font-bold">Next Article</div>
+          <div class="font-bold text-[#0000cc] dark:text-[#38bdf8] truncate">{nextPost?.data.title}</div>
+        </div>
+        <span class="text-base">▶</span>
       </a>
     ) : (
-      <div class="invisible" />
+      <div class="hidden sm:block" />
     )
   }
 </div>

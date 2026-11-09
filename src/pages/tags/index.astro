@@ -6,11 +6,26 @@ import TagCloud from "@components/TagCloud.astro";
 
 <Layout title="Tags" description="List of tags used.">
   <Container>
-    <div class="space-y-10">
-      <h1 class="animate font-semibold text-black dark:text-white">All Tags</h1>
-      <div class="animate">
-        <TagCloud />
-      </div>
+    <div class="space-y-6">
+      <!-- Tags Window -->
+      <section class="retro-bevel bg-[#d4d0c8] dark:bg-[#1a2336] p-2">
+        <div class="retro-sub-titlebar px-2.5 py-1 text-xs sm:text-sm font-bold flex items-center justify-between select-none">
+          <div class="flex items-center gap-2">
+            <span>🏷️</span>
+            <span>C:\DATABASE\CATEGORIES_AND_TAGS.IDX</span>
+          </div>
+          <span class="font-pixel text-xs text-white">INDEX: ALL</span>
+        </div>
+
+        <div class="my-2 px-2 py-1 text-xs font-mono bg-white dark:bg-[#0d131f] retro-bevel-inset flex items-center gap-2">
+          <span class="text-neutral-500 font-bold">TOPICS:</span>
+          <span class="text-[#0a246a] dark:text-[#38bdf8]">Browse posts categorized by technical keyword</span>
+        </div>
+
+        <div class="p-3 sm:p-4 bg-[#e8e4dc] dark:bg-[#0d131f] retro-bevel-inset">
+          <TagCloud />
+        </div>
+      </section>
     </div>
   </Container>
 </Layout>

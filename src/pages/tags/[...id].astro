@@ -28,14 +28,38 @@ const { tag, posts } = Astro.props;
 
 <Layout title={`Tag: ${tag}`} description={`Posts with the tag: ${tag}`}>
   <Container>
-    <div class="space-y-10" data-pagefind-ignore>
-      <BackToPrevious href="/tags"> All tags </BackToPrevious>
-      <h1 class="animate font-semibold text-black dark:text-white">
-        Posts tagged with "{tag}"
-      </h1>
-      <ul class="animate flex flex-col gap-4">
-        {posts.map((post) => <ArrowCard entry={post} />)}
-      </ul>
+    <div class="space-y-4" data-pagefind-ignore>
+      <!-- Back Navigation -->
+      <div class="flex items-center justify-between">
+        <BackToPrevious href="/tags">Back to all tags</BackToPrevious>
+        <span class="text-xs font-mono text-neutral-500">FILTER: #{tag}</span>
+      </div>
+
+      <!-- Tag Posts Window -->
+      <section class="retro-bevel bg-[#d4d0c8] dark:bg-[#1a2336] p-2">
+        <div class="retro-sub-titlebar px-2.5 py-1 text-xs sm:text-sm font-bold flex items-center justify-between select-none">
+          <div class="flex items-center gap-2">
+            <span>🏷️</span>
+            <span>TAG_FILTER.EXE: #{tag}</span>
+          </div>
+          <span class="font-pixel text-xs text-white">{posts.length} POSTS FOUND</span>
+        </div>
+
+        <div class="my-2 px-2 py-1 text-xs font-mono bg-white dark:bg-[#0d131f] retro-bevel-inset flex items-center gap-2">
+          <span class="text-neutral-500 font-bold">MATCHED ENTRIES:</span>
+          <span class="text-[#0a246a] dark:text-[#38bdf8]">Listing articles containing tag: #{tag}</span>
+        </div>
+
+        <div class="p-2 sm:p-3 bg-[#e8e4dc] dark:bg-[#0d131f] retro-bevel-inset space-y-3">
+          <ul class="not-prose flex flex-col gap-3">
+            {posts.map((post) => (
+              <li>
+                <ArrowCard entry={post} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
     </div>
   </Container>
 </Layout>

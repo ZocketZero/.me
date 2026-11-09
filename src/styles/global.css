@@ -6,157 +6,443 @@
 
 @theme {
   --font-sans:
-    Geist Sans, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    "MS Sans Serif", Geneva, Tahoma, Verdana, system-ui, -apple-system, sans-serif;
+  --font-retro:
+    "MS Sans Serif", Geneva, Tahoma, Verdana, sans-serif;
+  --font-pixel:
+    "VT323", "Silkscreen", "Courier New", monospace;
   --font-mono:
-    Geist Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+    "Courier New", Courier, "Lucida Console", Monaco, monospace;
+  --font-heading:
+    "Trebuchet MS", "Lucida Grande", Tahoma, Verdana, sans-serif;
 
-  --color-primary: var(--color-emerald-500);
-  --color-primary-dark: var(--color-emerald-400);
+  --color-primary: #0000ee;
+  --color-primary-dark: #38bdf8;
+  --color-retro-win: #ece9d8;
+  --color-retro-win-dark: #151c2c;
 }
 
-/*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-*/
 @layer base {
   *,
   ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-neutral-200, currentColor);
-  }
-  .dark *,
-  .dark ::after,
-  .dark ::before,
-  .dark ::backdrop,
-  .dark ::file-selector-button {
-    border-color: var(--color-neutral-800, currentColor);
+  ::before {
+    box-sizing: border-box;
   }
 }
 
-@layer utilities {
-  html {
-    overflow-y: auto;
-    color-scheme: light;
-    scroll-behavior: smooth;
-    scroll-padding-top: 100px;
-  }
+/* ==========================================================================
+   Retro 2000s Desktop Backgrounds & Body
+   ========================================================================== */
+html {
+  overflow-y: auto;
+  color-scheme: light;
+  scroll-behavior: smooth;
+  scroll-padding-top: 20px;
+}
 
-  html.dark {
-    color-scheme: dark;
-  }
+html.dark {
+  color-scheme: dark;
+}
 
-  html,
-  body {
-    @apply size-full;
-  }
+body {
+  font-family: var(--font-retro);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  /* Light mode: Classic Windows teal desktop with subtle grid */
+  background-color: #008080;
+  background-image: 
+    radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px),
+    radial-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+  background-size: 12px 12px;
+  background-position: 0 0, 6px 6px;
+  color: #1a1a1a;
+  selection-background-color: #000080;
+  selection-color: #ffffff;
+}
 
-  body {
-    @apply font-sans antialiased;
-    @apply flex flex-col;
-    @apply bg-white dark:bg-neutral-950;
-    @apply text-neutral-800 dark:text-neutral-200;
-    @apply selection:bg-primary/20 selection:text-primary;
-  }
+.dark body {
+  /* Dark mode: Y2K Cyber space / starfield */
+  background-color: #080c16;
+  background-image: 
+    radial-gradient(#334155 1px, transparent 1px),
+    radial-gradient(#1e293b 1px, transparent 1px);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
+  color: #e2e8f0;
+}
 
-  header {
-    @apply top-0 right-0 left-0 z-50 py-4;
-    @apply bg-white/80 dark:bg-neutral-950/80;
-    @apply saturate-150 backdrop-blur-md;
-    @apply border-b-2 border-neutral-200 dark:border-neutral-800;
-  }
+/* ==========================================================================
+   Classic 3D Bevel Utilities (Windows 98/2000 & Geocities)
+   ========================================================================== */
 
-  main {
-    @apply flex-1 py-24;
-  }
+/* Raised 3D Panel / Window / Button */
+.retro-bevel {
+  border-width: 2px;
+  border-style: solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  box-shadow: inset 1px 1px 0px #dfdfdf, inset -1px -1px 0px #404040;
+}
 
-  footer {
-    @apply py-12 text-sm text-neutral-500 dark:text-neutral-400;
-    @apply border-t border-neutral-200/50 dark:border-neutral-800/50;
-  }
+.dark .retro-bevel {
+  border-color: #475569 #020617 #020617 #475569;
+  box-shadow: inset 1px 1px 0px #334155, inset -1px -1px 0px #0f172a;
+}
 
-  article {
-    @apply prose prose-neutral dark:prose-invert max-w-none;
-    @apply prose-headings:font-bold prose-headings:tracking-tight;
-    @apply prose-headings:text-neutral-900 dark:prose-headings:text-neutral-50;
-    @apply prose-p:leading-relaxed prose-p:text-neutral-700 dark:prose-p:text-neutral-300;
-    @apply prose-a:no-underline hover:prose-a:underline;
-    @apply prose-img:rounded-xl prose-img:shadow-sm;
+/* Sunken 3D Well (Input fields, status bars, counters) */
+.retro-bevel-inset {
+  border-width: 2px;
+  border-style: solid;
+  border-color: #808080 #ffffff #ffffff #808080;
+  box-shadow: inset 1px 1px 0px #404040, inset -1px -1px 0px #dfdfdf;
+}
+
+.dark .retro-bevel-inset {
+  border-color: #020617 #475569 #475569 #020617;
+  box-shadow: inset 1px 1px 0px #0f172a, inset -1px -1px 0px #334155;
+}
+
+/* 3D Window Frame */
+.retro-window {
+  background-color: #ece9d8;
+  border-width: 3px;
+  border-style: solid;
+  border-color: #ffffff #404040 #404040 #ffffff;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.45), inset 1px 1px 0px #dfdfdf;
+}
+
+.dark .retro-window {
+  background-color: #111827;
+  border-color: #38bdf8 #020617 #020617 #38bdf8;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.2), 4px 4px 16px rgba(0, 0, 0, 0.7);
+}
+
+/* Classic Windows 98/2000 Gradient Titlebar */
+.retro-titlebar {
+  background: linear-gradient(90deg, #0a246a 0%, #a6caf0 100%);
+  color: #ffffff;
+  font-family: var(--font-retro);
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+}
+
+.dark .retro-titlebar {
+  background: linear-gradient(90deg, #0c4a6e 0%, #1e1b4b 50%, #064e3b 100%);
+  color: #38bdf8;
+  text-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+}
+
+/* Sub-window Titlebar (e.g. for widgets, cards) */
+.retro-sub-titlebar {
+  background: linear-gradient(90deg, #3a6ea5 0%, #80b5ea 100%);
+  color: #ffffff;
+  font-family: var(--font-retro);
+}
+
+.dark .retro-sub-titlebar {
+  background: linear-gradient(90deg, #1e293b 0%, #334155 100%);
+  color: #e2e8f0;
+}
+
+/* Classic Window Control Buttons (_ □ ✕) */
+.retro-win-ctrl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 16px;
+  font-size: 11px;
+  font-weight: bold;
+  font-family: var(--font-mono);
+  background-color: #d4d0c8;
+  color: #000000;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #ffffff #404040 #404040 #ffffff;
+  box-shadow: inset 1px 1px 0px #ffffff;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.retro-win-ctrl-btn:hover {
+  background-color: #e8e4dc;
+}
+
+.retro-win-ctrl-btn:active {
+  border-color: #404040 #ffffff #ffffff #404040;
+  box-shadow: inset 1px 1px 0px #404040;
+  transform: translate(1px, 1px);
+}
+
+.retro-win-ctrl-close:hover {
+  background-color: #e81123;
+  color: #ffffff;
+}
+
+/* Interactive 3D Beveled Button */
+.retro-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  font-family: var(--font-retro);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background-color: #e4e0d8;
+  color: #1a1a1a;
+  border-width: 2px;
+  border-style: solid;
+  border-color: #ffffff #404040 #404040 #ffffff;
+  box-shadow: inset 1px 1px 0px #dfdfdf, inset -1px -1px 0px #808080;
+  text-decoration: none !important;
+  cursor: pointer;
+  user-select: none;
+  transition: none;
+}
+
+.retro-btn:hover {
+  background-color: #ece8e0;
+}
+
+.retro-btn:active,
+.retro-btn.active {
+  border-color: #404040 #ffffff #ffffff #404040;
+  box-shadow: inset 1px 1px 0px #808080, inset -1px -1px 0px #dfdfdf;
+  background-color: #d8d4cc;
+  transform: translate(1px, 1px);
+}
+
+.dark .retro-btn {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  border-color: #475569 #020617 #020617 #475569;
+  box-shadow: inset 1px 1px 0px #334155, inset -1px -1px 0px #0f172a;
+}
+
+.dark .retro-btn:hover {
+  background-color: #334155;
+}
+
+.dark .retro-btn:active,
+.dark .retro-btn.active {
+  border-color: #020617 #475569 #475569 #020617;
+  background-color: #0f172a;
+}
+
+/* ==========================================================================
+   Retro Horizontal Groove Divider (<hr>)
+   ========================================================================== */
+.retro-hr {
+  border: 0;
+  height: 2px;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #ffffff;
+  margin: 1.25rem 0;
+}
+
+.dark .retro-hr {
+  border-top: 1px solid #0f172a;
+  border-bottom: 1px solid #334155;
+}
+
+/* Rainbow Divider (Classic Geocities) */
+.retro-rainbow-hr {
+  height: 3px;
+  border: none;
+  background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+  margin: 1rem 0;
+}
+
+/* ==========================================================================
+   Blinking Text Animation (Classic Web 1.0 <blink>)
+   ========================================================================== */
+@keyframes retro-blink-anim {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
   }
 }
 
-@layer utilities {
-  article a {
-    @apply text-primary dark:text-primary-dark decoration-primary/30 font-medium underline-offset-4;
-    @apply transition-all duration-200 ease-in-out;
-  }
-  article a:hover {
-    @apply decoration-primary;
-  }
+.blink {
+  animation: retro-blink-anim 1s step-start infinite;
 }
 
-.animate {
-  @apply translate-y-4 opacity-0;
-  transition:
-    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+
+
+
+/* ==========================================================================
+   Smooth Marquee Container
+   ========================================================================== */
+.retro-marquee-wrapper {
+  overflow: hidden;
+  white-space: nowrap;
+  background: #ffffcc;
+  color: #800000;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #808080;
+  padding: 3px 0;
+  font-family: var(--font-pixel);
+  font-size: 1.15rem;
 }
 
-.animate.show {
-  @apply translate-y-0 opacity-100;
+.dark .retro-marquee-wrapper {
+  background: #091322;
+  color: #38bdf8;
+  border-top: 1px solid #0369a1;
+  border-bottom: 1px solid #0369a1;
 }
 
-/* Glassmorphism utility */
-.glass {
-  @apply border border-white/20 bg-white/10 backdrop-blur-md dark:border-white/5 dark:bg-black/10;
+/* ==========================================================================
+   Authentic Early 2000s Hyperlink Styling
+   ========================================================================== */
+a {
+  color: #0000cc;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
-/* Shiki config */
+a:visited {
+  color: #551a8b;
+}
+
+a:hover {
+  color: #ff0000;
+  background-color: rgba(255, 255, 0, 0.25);
+}
+
+a:active {
+  color: #ff0000;
+}
+
+.dark a {
+  color: #38bdf8;
+}
+
+.dark a:visited {
+  color: #c084fc;
+}
+
+.dark a:hover {
+  color: #00ff66;
+  background-color: rgba(0, 255, 102, 0.15);
+}
+
+/* ==========================================================================
+   Typography / Article Styling for Blog Posts
+   ========================================================================== */
+article {
+  font-family: var(--font-retro);
+  line-height: 1.6;
+  color: #222222;
+}
+
+.dark article {
+  color: #e2e8f0;
+}
+
+article h1,
+article h2,
+article h3,
+article h4 {
+  font-family: var(--font-heading);
+  color: #0a246a;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: bold;
+}
+
+.dark article h1,
+.dark article h2,
+.dark article h3,
+.dark article h4 {
+  color: #38bdf8;
+}
+
+article h1 {
+  font-size: 1.75rem;
+  border-bottom: 2px solid #0a246a;
+  padding-bottom: 0.35rem;
+}
+
+.dark article h1 {
+  border-bottom: 2px solid #38bdf8;
+}
+
+article h2 {
+  font-size: 1.35rem;
+  background: #e2dfd5;
+  padding: 0.25rem 0.5rem;
+  border-left: 4px solid #0a246a;
+}
+
+.dark article h2 {
+  background: #1e293b;
+  border-left: 4px solid #38bdf8;
+}
+
+article h3 {
+  font-size: 1.15rem;
+}
+
+article p {
+  margin-bottom: 1rem;
+}
+
+article blockquote {
+  border-left: 4px solid #0a246a;
+  background: #f5f4ef;
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+}
+
+.dark article blockquote {
+  border-left: 4px solid #38bdf8;
+  background: #1e293b;
+}
+
+/* Retro Code Blocks (styled like Notepad / MS-DOS Terminal) */
 pre {
-  @apply relative rounded-xl border border-neutral-200/50 bg-neutral-50 p-4 dark:border-neutral-800/50 dark:bg-neutral-900/50;
+  position: relative;
+  background: #0c1017 !important;
+  color: #00ff66 !important;
+  border: 2px inset #808080;
+  padding: 1rem;
+  font-family: var(--font-mono) !important;
+  font-size: 0.85rem;
+  overflow-x: auto;
+  border-radius: 0 !important;
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.8);
 }
 
-:root {
-  --astro-code-foreground: #09090b;
-  --astro-code-background: #fafafa;
-  --astro-code-token-comment: #a19595;
-  --astro-code-token-keyword: #f47067;
-  --astro-code-token-string: #00a99a;
-  --astro-code-token-function: #429996;
-  --astro-code-token-constant: #2b70c5;
-  --astro-code-token-parameter: #4e8fdf;
-  --astro-code-token-string-expression: #ae42a0;
-  --astro-code-token-punctuation: #8996a3;
-  --astro-code-token-link: #8d85ff;
-}
-
-.dark {
-  --astro-code-foreground: #fafafa;
-  --astro-code-background: #09090b;
-  --astro-code-token-comment: #a19595;
-  --astro-code-token-keyword: #f47067;
-  --astro-code-token-string: #00a99a;
-  --astro-code-token-function: #6eafad;
-  --astro-code-token-constant: #b3cceb;
-  --astro-code-token-parameter: #4e8fdf;
-  --astro-code-token-string-expression: #bf7db6;
-  --astro-code-token-punctuation: #8996a3;
-  --astro-code-token-link: #8d85ff;
-}
-
-/* copy code button on codeblocks */
 .copy-code {
-  @apply absolute top-3 right-3 grid size-9 place-content-center rounded-sm border border-black/15 bg-neutral-100 text-center duration-300 ease-in-out dark:border-white/20 dark:bg-neutral-900;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-content: center;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: var(--font-retro);
+  background: #d4d0c8;
+  color: #000;
+  border: 1px solid;
+  border-color: #fff #404040 #404040 #fff;
+  cursor: pointer;
 }
 
 .copy-code:hover {
-  @apply bg-[#E9E9E9] transition-colors dark:bg-[#232323];
+  background: #eee;
 }
 
 .copy-code:active {
-  @apply scale-90 transition-transform;
+  border-color: #404040 #fff #fff #404040;
+  transform: translate(1px, 1px);
+}
+
+/* Animation utilities */
+.animate {
+  opacity: 1;
 }

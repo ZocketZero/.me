@@ -1,90 +1,81 @@
 ---
 import Container from "@components/Container.astro";
 import { SITE } from "@consts";
-import BackToTop from "@components/BackToTop.astro";
 ---
 
-<footer class="animate">
+<footer class="border-t-2 border-[#808080] dark:border-[#334155] bg-[#d4d0c8] dark:bg-[#151c2c] p-3 sm:p-5 select-none text-neutral-800 dark:text-neutral-200">
   <Container>
-    <div class="relative">
-      <div class="absolute -top-12 right-0">
-        <BackToTop />
+    <div class="flex flex-col items-center gap-5 text-center">
+
+      <!-- The WebRing 2000 Box -->
+      <div class="retro-bevel bg-[#ece9d8] dark:bg-[#1e293b] p-2.5 max-w-lg w-full text-xs font-retro">
+        <div class="font-bold text-[#0a246a] dark:text-[#38bdf8] border-b border-[#808080] pb-1">
+          ~*~ The Open Source & Cyber-Dev WebRing ~*~
+        </div>
+        <div class="py-1.5 flex items-center justify-center gap-3 font-bold">
+          <a href="#webring" class="retro-btn text-xs py-0.5 px-2">&laquo; Prev Site</a>
+          <a href="#webring" class="retro-btn text-xs py-0.5 px-2">Next Site &raquo;</a>
+        </div>
+        <div class="text-[11px] text-neutral-500 dark:text-neutral-400 font-mono">
+          Member #042 | Join the Ring by contacting the Webmaster!
+        </div>
       </div>
-    </div>
-    <div class="flex items-center justify-between">
-      <div>&copy; {new Date().getFullYear()} • {SITE.TITLE} 🔬</div>
-      <div class="flex flex-wrap items-center gap-1.5">
+
+      <hr class="retro-hr w-full max-w-xl" />
+
+      <!-- Controls Row: Theme Buttons & Back to Top -->
+      <div class="flex flex-wrap items-center justify-center gap-2">
+        <span class="text-xs font-bold mr-1">Display Theme:</span>
         <button
           id="light-theme-button"
           aria-label="Light theme"
-          class="group flex size-9 items-center justify-center rounded-sm border border-black/15 hover:bg-black/5 focus-visible:bg-black/5 dark:border-white/20 dark:hover:bg-white/5 dark:focus-visible:bg-white/5"
+          class="retro-btn text-xs"
+          title="Classic 2000s Teal & Windows Grey"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="transition-colors duration-300 ease-in-out group-hover:animate-pulse group-hover:stroke-black group-focus-visible:animate-pulse group-focus-visible:stroke-black dark:group-hover:stroke-white dark:group-focus-visible:stroke-white"
-          >
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-          </svg>
+          <span>☀️</span>
+          <span>Classic 2000</span>
         </button>
+
         <button
           id="dark-theme-button"
           aria-label="Dark theme"
-          class="group flex size-9 items-center justify-center rounded-sm border border-black/15 hover:bg-black/5 focus-visible:bg-black/5 dark:border-white/20 dark:hover:bg-white/5 dark:focus-visible:bg-white/5"
+          class="retro-btn text-xs"
+          title="Y2K Cyber Night & Neon"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="transition-colors duration-300 ease-in-out group-hover:animate-pulse group-hover:stroke-black group-focus-visible:animate-pulse group-focus-visible:stroke-black dark:group-hover:stroke-white dark:group-focus-visible:stroke-white"
-          >
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
+          <span>🌙</span>
+          <span>Y2K Cyber</span>
         </button>
+
         <button
           id="system-theme-button"
           aria-label="System theme"
-          class="group flex size-9 items-center justify-center rounded-sm border border-black/15 hover:bg-black/5 focus-visible:bg-black/5 dark:border-white/20 dark:hover:bg-white/5 dark:focus-visible:bg-white/5"
+          class="retro-btn text-xs"
+          title="Match System Settings"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="transition-colors duration-300 ease-in-out group-hover:animate-pulse group-hover:stroke-black group-focus-visible:animate-pulse group-focus-visible:stroke-black dark:group-hover:stroke-white dark:group-focus-visible:stroke-white"
-          >
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-            <line x1="8" y1="21" x2="16" y2="21"></line>
-            <line x1="12" y1="17" x2="12" y2="21"></line>
-          </svg>
+          <span>🖥️</span>
+          <span>System</span>
+        </button>
+
+        <button
+          id="back-to-top"
+          aria-label="Back to top"
+          class="retro-btn text-xs ml-2 bg-[#ffffe0] dark:bg-[#0f172a]"
+          title="Scroll back to top of page"
+        >
+          <span>▲</span>
+          <span>Top</span>
         </button>
       </div>
+
+      <!-- Copyright & System Meta -->
+      <div class="text-xs font-retro space-y-1 text-neutral-600 dark:text-neutral-400 border-t border-[#808080] dark:border-[#334155] pt-3 w-full">
+        <div>
+          &copy; 2001-{new Date().getFullYear()} • <strong>{SITE.TITLE}</strong> </div>
+        <div class="font-pixel text-sm">
+          Best viewed at 1024x768 in Netscape Navigator or Internet Explorer 5.0+
+        </div>
+      </div>
+
     </div>
   </Container>
 </footer>

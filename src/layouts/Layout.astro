@@ -18,20 +18,71 @@ const { title, description } = Astro.props;
   <head>
     <Head title={`${title} | ${SITE.TITLE}`} description={description} />
   </head>
-  <body>
-    <noscript>
-      <style>
-        .animate{
-          opacity:1;
-          translate: var(--tw-translate-x) calc(var(--spacing) * 0);
-        }
-      </style>
-    </noscript>
-    <Header />
-    <main>
-      <slot />
-    </main>
-    <Footer />
+  <body class="selection:bg-[#000080] selection:text-white">
+    <div class="min-h-screen py-2 sm:py-6 px-1.5 sm:px-4 flex flex-col items-center">
+      <!-- Outer Main Window (Web Browser Frame) -->
+      <div class="w-full max-w-4xl retro-window flex flex-col">
+        
+        <!-- Windows 98/2000 Browser Title Bar -->
+        <div class="retro-titlebar flex items-center justify-between px-2 py-1 select-none border-b border-[#404040]">
+          <div class="flex items-center gap-1.5 overflow-hidden text-xs sm:text-sm font-bold tracking-wide">
+            <span class="text-sm">🌐</span>
+            <span class="truncate">Nawasan's CyberHome 2000 - [Internet Explorer 5.5]</span>
+          </div>
+          <div class="flex items-center gap-1 shrink-0 ml-2">
+            <button class="retro-win-ctrl-btn" title="Minimize" aria-label="Minimize">_</button>
+            <button class="retro-win-ctrl-btn" title="Maximize" aria-label="Maximize">□</button>
+            <button class="retro-win-ctrl-btn retro-win-ctrl-close" title="Close" aria-label="Close" onclick="alert('Cannot close retro cyberspace! Enjoy the nostalgia :)')">✕</button>
+          </div>
+        </div>
+
+        <!-- Classic Menu Bar: File, Edit, View, Favorites, Tools, Help -->
+        <div class="hidden sm:flex items-center gap-3 px-2 py-0.5 text-xs bg-[#d4d0c8] dark:bg-[#1a2234] border-b border-[#808080] select-none text-neutral-800 dark:text-neutral-200">
+          <span class="hover:underline cursor-pointer"><span class="underline">F</span>ile</span>
+          <span class="hover:underline cursor-pointer"><span class="underline">E</span>dit</span>
+          <span class="hover:underline cursor-pointer"><span class="underline">V</span>iew</span>
+          <span class="hover:underline cursor-pointer">Fa<span class="underline">v</span>orites</span>
+          <span class="hover:underline cursor-pointer"><span class="underline">T</span>ools</span>
+          <span class="hover:underline cursor-pointer"><span class="underline">H</span>elp</span>
+        </div>
+
+        <!-- Address Bar (URL Bar) -->
+        <div class="flex items-center gap-2 px-2 py-1 text-xs bg-[#e4e0d8] dark:bg-[#161f30] border-b border-[#808080]">
+          <span class="font-bold text-[#555] dark:text-[#94a3b8] select-none shrink-0 font-retro">Address:</span>
+          <div class="flex-1 retro-bevel-inset bg-white dark:bg-[#090d16] px-2 py-0.5 font-mono text-[11px] sm:text-xs text-[#0000cc] dark:text-[#38bdf8] truncate flex items-center justify-between">
+            <span>http://www.nawasan.dev{Astro.url.pathname}</span>
+            <span class="text-neutral-400 select-none hidden md:inline">🔒 128-bit SSL</span>
+          </div>
+          <div class="hidden sm:flex items-center gap-1 shrink-0">
+            <a href="/" class="retro-btn text-[11px] py-0.5 px-2">Go</a>
+          </div>
+        </div>
+
+        <!-- Main Site Header (Banner + Toolbar Navigation + Marquee) -->
+        <Header />
+
+        <!-- Page Content -->
+        <main class="flex-1 py-4 sm:py-6 px-2 sm:px-5 bg-[#ece9d8] dark:bg-[#111827]">
+          <slot />
+        </main>
+
+        <!-- Site Footer (WebRing + Theme Controls) -->
+        <Footer />
+
+        <!-- Windows Status Bar at Bottom of Window -->
+        <div class="flex items-center justify-between px-2 py-1 text-[11px] font-retro bg-[#d4d0c8] dark:bg-[#1a2234] border-t border-[#808080] text-neutral-700 dark:text-neutral-300 select-none">
+          <div class="flex items-center gap-2 truncate">
+            <span class="retro-bevel-inset px-1.5 py-0.5 bg-white/50 dark:bg-black/30">Done</span>
+            <span class="hidden sm:inline">Internet Zone | Protected Mode: Off</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="retro-bevel-inset px-1.5 py-0.5 bg-white/50 dark:bg-black/30 font-pixel text-xs text-emerald-700 dark:text-emerald-400 font-bold blink">
+              ● 56.6k DIAL-UP
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
     <Pagefind />
   </body>
 </html>

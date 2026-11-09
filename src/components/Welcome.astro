@@ -1,61 +1,113 @@
 ---
 import Link from "./Link.astro";
+import { SITE } from "@consts";
 ---
 
-<section class="animate">
-  <div class="flex flex-col-reverse items-start gap-8 md:flex-row">
-    <div class="relative mx-auto shrink-0 md:mx-0">
-      <div
-        class="from-primary absolute -inset-1 rounded-2xl bg-gradient-to-tr to-emerald-300 opacity-30 blur-xl dark:opacity-20"
-      >
+<section class="space-y-4">
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
+    <!-- Left: Webmaster Avatar & System Profile Card -->
+    <div class="md:col-span-5 flex flex-col gap-3">
+      <!-- 3D Beveled Picture Frame -->
+      <div class="retro-bevel bg-[#d4d0c8] dark:bg-[#1e293b] p-2">
+        <div class="retro-sub-titlebar px-2 py-0.5 text-xs font-bold flex items-center justify-between">
+          <span>👤 webmaster.jpg</span>
+          <span>[224x224]</span>
+        </div>
+        <div class="p-2 flex justify-center bg-[#c0c0c0] dark:bg-[#0f172a] retro-bevel-inset mt-1">
+          <img
+            class="size-44 sm:size-48 object-cover border-2 border-black"
+            src="https://avatars.githubusercontent.com/u/96001130?v=4"
+            alt="Nawasan's profile"
+            width="224"
+            height="224"
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+        
+        <!-- Webmaster Specs Sheet -->
+        <div class="mt-2 text-xs font-mono bg-white dark:bg-[#090d16] retro-bevel-inset p-2 space-y-1">
+          <div class="flex justify-between border-b border-neutral-200 dark:border-neutral-800 pb-0.5">
+            <span class="text-neutral-500 font-bold">NAME:</span>
+            <span class="font-bold text-[#0a246a] dark:text-[#38bdf8]">ณวสันต์ (Nawasan)</span>
+          </div>
+          <div class="flex justify-between border-b border-neutral-200 dark:border-neutral-800 pb-0.5">
+            <span class="text-neutral-500 font-bold">HANDLE:</span>
+            <span>ZocketZero</span>
+          </div>
+          <div class="flex justify-between border-b border-neutral-200 dark:border-neutral-800 pb-0.5">
+            <span class="text-neutral-500 font-bold">OS:</span>
+            <span>🐧 Arch Linux</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-neutral-500 font-bold">STATUS:</span>
+            <span class="text-emerald-600 dark:text-emerald-400 font-bold blink">● ONLINE (Surfing)</span>
+          </div>
+        </div>
       </div>
-      <img
-        class="relative h-48 w-48 rounded-2xl border border-neutral-200 object-cover shadow-2xl md:h-56 md:w-56 dark:border-neutral-800"
-        src="https://avatars.githubusercontent.com/u/96001130?v=4"
-        alt="Nawasan's profile"
-        width="224"
-        height="224"
-        loading="eager"
-        decoding="async"
-      />
     </div>
 
-    <div class="flex-1 space-y-6">
-      <h1
-        class="text-4xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
-      >
-        <span>สวัสดีครับ</span>
-        <span class="my-1">
-          ผมชื่อ <span class="text-primary dark:text-primary-dark">ณวสันต์</span
-          >
-        </span>
-      </h1>
+    <!-- Right: Notepad Window with Greeting -->
+    <div class="md:col-span-7 retro-bevel bg-[#ece9d8] dark:bg-[#1e293b] flex flex-col">
+      <!-- Notepad Window Titlebar -->
+      <div class="retro-titlebar px-2 py-0.5 text-xs font-bold flex items-center justify-between select-none">
+        <div class="flex items-center gap-1.5">
+          <span>📝</span>
+          <span>notepad.exe - WELCOME.TXT</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="retro-win-ctrl-btn">_</span>
+          <span class="retro-win-ctrl-btn">□</span>
+          <span class="retro-win-ctrl-btn">✕</span>
+        </div>
+      </div>
 
-      <div
-        class="space-y-4 text-lg leading-relaxed text-neutral-700 dark:text-neutral-300"
-      >
+      <!-- Notepad Menu Bar -->
+      <div class="hidden sm:flex items-center gap-3 px-2 py-0.5 text-xs bg-[#d4d0c8] dark:bg-[#151c2c] border-b border-[#808080] select-none text-neutral-700 dark:text-neutral-300">
+        <span class="hover:underline cursor-pointer">File</span>
+        <span class="hover:underline cursor-pointer">Edit</span>
+        <span class="hover:underline cursor-pointer">Search</span>
+        <span class="hover:underline cursor-pointer">Help</span>
+      </div>
+
+      <!-- Notepad Content Surface -->
+      <div class="retro-bevel-inset bg-white dark:bg-[#090d16] p-4 m-1.5 space-y-3 font-retro text-sm leading-relaxed text-neutral-800 dark:text-neutral-200">
+        <div class="border-b-2 border-dashed border-[#808080] pb-2">
+          <h2 class="text-xl sm:text-2xl font-bold text-[#0a246a] dark:text-[#38bdf8] font-heading">
+            สวัสดีครับ! ผมชื่อ <span class="text-[#ff0000] dark:text-[#00ff66]">ณวสันต์</span> 
+          </h2>
+          <div class="font-pixel text-xs text-neutral-500 mt-0.5">
+            [FILE: C:\HOMEPAGE\INTRO.TXT | ENCODING: UTF-8]
+          </div>
+        </div>
+
         <p>
-          ใน <Link href="/blog">blog</Link> แห่งนี้ ผมรวบรวมความคิดเห็น ประสบการณ์
-          และความรู้จากการศึกษาค้นคว้า ซึ่งอาจมีทั้งสิ่งที่ถูกต้องและผิดพลาด จึงขอให้ผู้อ่านใช้วิจารณญาณในการอ่านนะครับ
-          😄
+          ยินดีต้อนรับสู่โฮมเพจส่วนตัวของผมครับ! ใน <Link href="/blog">blog</Link> แห่งนี้ ผมรวบรวมความคิดเห็น ประสบการณ์
+          และความรู้จากการศึกษาค้นคว้าทางคอมพิวเตอร์ ซึ่งอาจมีทั้งสิ่งที่ถูกต้องและผิดพลาด จึงขอให้ผู้อ่านใช้วิจารณญาณในการอ่านนะครับ 😄
         </p>
 
         <p>
           และในส่วนของ <Link href="/projects">project</Link> ต่างๆ ที่ผมได้พัฒนาขึ้นมา
-          บางส่วนก็จะสร้างขึ้นมาเพื่อแก้ปัญหาที่ผมเจอในชีวิตประจำวัน ซึ่งด้วยผมใช้
-          <strong>Linux</strong> เป็นหลัก การทดสอบโปรแกรมต่างๆ จึงมักจะเน้นไปที่ระบบปฏิบัติการ
-          Linux เป็นหลัก แม้จะไม่ได้ทดสอบบนระบบปฏิบัติการอื่น แต่ก็หวังเป็นอย่างยิ่งว่ามันจะทำงานได้
+          บางส่วนถูกสร้างขึ้นเพื่อแก้ปัญหาที่ผมพบเจอในชีวิตประจำวัน โดยผมใช้ระบบปฏิบัติการ
+          <strong>Linux (Arch Linux)</strong> เป็นหลัก การพัฒนาและทดสอบโปรแกรมต่างๆ จึงเน้นบนระบบปฏิบัติการ
+          Linux เป็นหลัก แต่ก็มุ่งหวังให้ทำงานได้อย่างราบรื่นบนทุกแพลตฟอร์มครับ
         </p>
-      </div>
 
-      <div class="flex flex-wrap gap-4 pt-2">
-        <Link
-          external
-          href="https://github.com/ZocketZero"
-          class="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 font-medium text-white transition-transform hover:scale-105 dark:bg-neutral-50 dark:text-neutral-900"
-        >
-          <span>Follow on GitHub</span>
-        </Link>
+        <!-- Retro Action Buttons -->
+        <div class="pt-2 flex flex-wrap items-center gap-2 border-t border-neutral-200 dark:border-neutral-800">
+          <a href={`mailto:${SITE.EMAIL}`} class="retro-btn">
+            <span>✉️</span>
+            <span>Send Email</span>
+          </a>
+          <a href="/projects" class="retro-btn">
+            <span>💾</span>
+            <span>Browse Projects</span>
+          </a>
+          <a href="/blog" class="retro-btn">
+            <span>📓</span>
+            <span>Read Articles</span>
+          </a>
+        </div>
       </div>
     </div>
   </div>

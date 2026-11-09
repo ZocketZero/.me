@@ -3,7 +3,6 @@ import Layout from "@layouts/Layout.astro";
 import Container from "@components/Container.astro";
 import { SITE, HOME, SOCIALS } from "@consts";
 import ArrowCard from "@components/ArrowCard.astro";
-import Link from "@components/Link.astro";
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import Welcome from "@components/Welcome.astro";
@@ -21,21 +20,29 @@ const projects: CollectionEntry<"projects">[] = (
 
 <Layout title={HOME.TITLE} description={HOME.DESCRIPTION}>
   <Container>
-    <div data-pagefind-ignore>
-      <h1 class="py-3 text-center font-semibold text-black dark:text-white">
-        Hello, friend !
-      </h1>
-      <div class="space-y-16">
-        <Welcome />
+    <div data-pagefind-ignore class="space-y-6">
+      
+      <!-- Welcome Hero Component -->
+      <Welcome />
 
-        <section class="animate space-y-6">
-          <div class="flex flex-wrap items-center justify-between gap-y-2">
-            <h2 class="font-semibold text-black dark:text-white">
-              Latest posts
-            </h2>
-            <Link href="/blog"> See all posts </Link>
+      <hr class="retro-hr" />
+
+      <!-- Latest Blog Posts Window -->
+      <section class="retro-bevel bg-[#d4d0c8] dark:bg-[#1a2336] p-1.5 sm:p-2">
+        <!-- Section Header Bar -->
+        <div class="retro-sub-titlebar px-2.5 py-1 text-xs sm:text-sm font-bold flex items-center justify-between select-none">
+          <div class="flex items-center gap-2">
+            <span>📁</span>
+            <span>C:\ARTICLES\LATEST_POSTS.LOG</span>
           </div>
-          <ul class="not-prose flex flex-col gap-4">
+          <a href="/blog" class="retro-btn text-xs py-0.5 px-2 bg-[#ece8e0] dark:bg-[#0f172a]">
+            <span>📂 View All Posts</span>
+          </a>
+        </div>
+
+        <!-- Section Content List -->
+        <div class="p-2 sm:p-3 bg-[#e8e4dc] dark:bg-[#0d131f] retro-bevel-inset mt-1.5 space-y-3">
+          <ul class="not-prose flex flex-col gap-3">
             {
               blog.map((post) => (
                 <li>
@@ -44,16 +51,27 @@ const projects: CollectionEntry<"projects">[] = (
               ))
             }
           </ul>
-        </section>
+        </div>
+      </section>
 
-        <section class="animate space-y-6">
-          <div class="flex flex-wrap items-center justify-between gap-y-2">
-            <h2 class="font-semibold text-black dark:text-white">
-              Recent projects
-            </h2>
-            <Link href="/projects"> See all projects </Link>
+      <hr class="retro-hr" />
+
+      <!-- Recent Projects Window -->
+      <section class="retro-bevel bg-[#d4d0c8] dark:bg-[#1a2336] p-1.5 sm:p-2">
+        <!-- Section Header Bar -->
+        <div class="retro-sub-titlebar px-2.5 py-1 text-xs sm:text-sm font-bold flex items-center justify-between select-none">
+          <div class="flex items-center gap-2">
+            <span>💾</span>
+            <span>C:\SOFTWARE\PROJECTS_PORTFOLIO.EXE</span>
           </div>
-          <ul class="not-prose flex flex-col gap-4">
+          <a href="/projects" class="retro-btn text-xs py-0.5 px-2 bg-[#ece8e0] dark:bg-[#0f172a]">
+            <span>📂 View All Projects</span>
+          </a>
+        </div>
+
+        <!-- Section Content List -->
+        <div class="p-2 sm:p-3 bg-[#e8e4dc] dark:bg-[#0d131f] retro-bevel-inset mt-1.5 space-y-3">
+          <ul class="not-prose flex flex-col gap-3">
             {
               projects.map((project) => (
                 <li>
@@ -62,44 +80,51 @@ const projects: CollectionEntry<"projects">[] = (
               ))
             }
           </ul>
-        </section>
+        </div>
+      </section>
 
-        <section class="animate space-y-4">
-          <h2 class="font-semibold text-black dark:text-white">
-            Let's Connect
-          </h2>
-          <article>
-            <p>
-              หากต้องการติดต่อเกี่ยวกับเรื่องใดเรื่องหนึ่งหรือเพียงแค่ทักทาย
-              สามารถติดต่อได้ทางโซเชียลมีเดียหรือส่งอีเมลมาได้เลย
-            </p>
-          </article>
-          <ul class="not-prose flex flex-wrap gap-2">
+      <hr class="retro-hr" />
+
+      <!-- Let's Connect / Webmaster Guestbook Contact -->
+      <section class="retro-bevel bg-[#d4d0c8] dark:bg-[#1a2336] p-1.5 sm:p-2">
+        <div class="retro-sub-titlebar px-2.5 py-1 text-xs sm:text-sm font-bold flex items-center justify-between select-none">
+          <div class="flex items-center gap-2">
+            <span>✉️</span>
+            <span>GUESTBOOK & CONTACT INFORMATION</span>
+          </div>
+          <span class="font-pixel text-xs text-white">INTERNET MAIL</span>
+        </div>
+
+        <div class="p-3 sm:p-4 bg-white dark:bg-[#0d131f] retro-bevel-inset mt-1.5 space-y-3">
+          <p class="text-sm font-retro text-neutral-800 dark:text-neutral-200">
+            หากต้องการติดต่อเกี่ยวกับเรื่องใดเรื่องหนึ่งหรือเพียงแค่ทักทาย สามารถติดต่อได้ทางโซเชียลมีเดียหรือส่งอีเมลมาได้เลยครับ ยินดีพูดคุยแลกเปลี่ยนเรื่องเทคโนโลยีเสมอ!
+          </p>
+
+          <div class="flex flex-wrap gap-2 pt-1">
             {
-              SOCIALS.map((SOCIAL) => (
-                <li class="flex gap-x-2 text-nowrap">
-                  <Link
-                    href={SOCIAL.HREF}
-                    external
-                    aria-label={`${SITE.TITLE} on ${SOCIAL.NAME}`}
-                  >
-                    {SOCIAL.NAME}
-                  </Link>
-                  {"/"}
-                </li>
+              SOCIALS.map((social) => (
+                <a
+                  href={social.HREF}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="retro-btn text-xs"
+                >
+                  <span>🔗</span>
+                  <span>{social.NAME}</span>
+                </a>
               ))
             }
-            <li class="line-clamp-1">
-              <Link
-                href={`mailto:${SITE.EMAIL}`}
-                aria-label={`Email ${SITE.TITLE}`}
-              >
-                {SITE.EMAIL}
-              </Link>
-            </li>
-          </ul>
-        </section>
-      </div>
+            <a
+              href={`mailto:${SITE.EMAIL}`}
+              class="retro-btn text-xs bg-yellow-100 dark:bg-yellow-950/40 text-black dark:text-yellow-200"
+            >
+              <span>📧</span>
+              <span>{SITE.EMAIL}</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
     </div>
   </Container>
 </Layout>

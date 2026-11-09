@@ -24,9 +24,8 @@ const {
   target={external ? "_blank" : "_self"}
   rel={external ? "noopener noreferrer" : undefined}
   class={cn(
-    "inline-block transition-colors duration-300 ease-in-out",
-    underline &&
-      "underline underline-offset-[3px] decoration-black/30 dark:decoration-white/30 hover:decoration-black/50 dark:hover:decoration-white/50",
+    "text-[#0000cc] dark:text-[#38bdf8] hover:text-[#ff0000] dark:hover:text-[#00ff66] hover:bg-yellow-200/50 dark:hover:bg-cyan-950/50 font-medium",
+    underline ? "underline underline-offset-2" : "no-underline",
     group && "group",
     className,
   )}

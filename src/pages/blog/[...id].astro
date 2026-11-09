@@ -35,45 +35,89 @@ const { Content, headings } = await render(post);
 
 <Layout title={post.data.title} description={post.data.description}>
   <Container>
-    <div class="animate">
-      <BackToPrevious href="/blog">Back to blog</BackToPrevious>
-    </div>
-    <div class="my-10 space-y-1">
-      <div class="animate flex items-center gap-1.5">
-        <div class="font-base text-sm">
-          <FormattedDate date={post.data.date} />
-        </div>
-        &bull;
-        {
-          post.body && (
-            <div class="font-base text-sm">{readingTime(post.body)}</div>
-          )
-        }
+    <div class="space-y-4">
+      
+      <!-- Back Navigation Toolbar -->
+      <div class="flex items-center justify-between">
+        <BackToPrevious href="/blog">Back to blog archives</BackToPrevious>
+        <span class="text-xs font-mono text-neutral-500">ID: {post.id}</span>
       </div>
-      <h1 class="animate text-3xl font-semibold text-black dark:text-white">
-        {post.data.title}
-      </h1>
-      {
-        post.data.tags && post.data.tags?.length > 0 ? (
-          <div class="animate flex gap-2 pt-1">
-            {post.data.tags.map((tag) => (
-              <a
-                href={`/tags/${tag}`}
-                class="rounded-sm border border-black/15 px-2 py-1 text-sm transition-colors duration-300 ease-in-out hover:bg-black/5 hover:text-black focus-visible:bg-black/5 focus-visible:text-black dark:border-white/20 dark:hover:bg-white/5 dark:hover:text-white dark:focus-visible:bg-white/5 dark:focus-visible:text-white"
-              >
-                {tag}
-              </a>
-            ))}
+
+      <!-- Main Document Window -->
+      <div class="retro-bevel bg-[#d4d0c8] dark:bg-[#1a2336] p-1.5 sm:p-2">
+        <!-- Document Titlebar -->
+        <div class="retro-titlebar px-2.5 py-1 text-xs sm:text-sm font-bold flex items-center justify-between select-none">
+          <div class="flex items-center gap-2 truncate">
+            <span>📄</span>
+            <span class="truncate">{post.data.title} - Document Viewer</span>
           </div>
-        ) : null
-      }
-    </div>
-    {headings.length > 0 && <TableOfContents headings={headings} />}
-    <article class="animate">
-      <Content />
-      <div class="mt-24">
-        <PostNavigation prevPost={prevPost} nextPost={nextPost} />
+          <div class="flex items-center gap-1 shrink-0 ml-2">
+            <span class="retro-win-ctrl-btn">_</span>
+            <span class="retro-win-ctrl-btn">□</span>
+            <span class="retro-win-ctrl-btn">✕</span>
+          </div>
+        </div>
+
+        <!-- Document Metadata Header -->
+        <div class="p-3 bg-white dark:bg-[#0d131f] retro-bevel-inset m-1.5 space-y-2">
+          <h1 class="text-xl sm:text-3xl font-extrabold text-[#0a246a] dark:text-[#38bdf8] font-heading">
+            {post.data.title}
+          </h1>
+
+          <div class="flex flex-wrap items-center gap-2 text-xs font-mono text-neutral-600 dark:text-neutral-400 border-t border-dashed border-[#808080] pt-2">
+            <div class="flex items-center gap-1">
+              <span class="font-bold">📅 PUBLISHED:</span>
+              <FormattedDate date={post.data.date} />
+            </div>
+            {
+              post.body && (
+                <>
+                  <span>|</span>
+                  <div class="flex items-center gap-1">
+                    <span class="font-bold">⏱️ ESTIMATED READ:</span>
+                    <span>{readingTime(post.body)}</span>
+                  </div>
+                </>
+              )
+            }
+          </div>
+
+          {
+            post.data.tags && post.data.tags.length > 0 && (
+              <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                <span class="text-xs font-mono font-bold text-neutral-500">CATEGORIES:</span>
+                {post.data.tags.map((tag) => (
+                  <a
+                    href={`/tags/${tag}`}
+                    class="retro-btn text-xs py-0.5 px-1.5"
+                  >
+                    #{tag}
+                  </a>
+                ))}
+              </div>
+            )
+          }
+        </div>
+
+        <!-- Table of Contents if available -->
+        {headings.length > 0 && (
+          <div class="px-1.5 py-1">
+            <TableOfContents headings={headings} />
+          </div>
+        )}
+
+        <!-- Article Prose Body -->
+        <div class="p-3 sm:p-6 bg-white dark:bg-[#090d16] retro-bevel-inset m-1.5">
+          <article>
+            <Content />
+          </article>
+
+          <div class="mt-12 pt-4 border-t-2 border-[#808080] dark:border-[#334155]">
+            <PostNavigation prevPost={prevPost} nextPost={nextPost} />
+          </div>
+        </div>
       </div>
-    </article>
+
+    </div>
   </Container>
 </Layout>

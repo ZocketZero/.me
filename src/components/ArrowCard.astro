@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import FormattedDate from "./FormattedDate.astro";
 
 type Props = {
   entry: CollectionEntry<"blog"> | CollectionEntry<"projects">;
@@ -8,38 +9,56 @@ type Props = {
 const { entry } = Astro.props as {
   entry: CollectionEntry<"blog"> | CollectionEntry<"projects">;
 };
+
+const isBlog = entry.collection === "blog";
 ---
 
-<a
-  href={`/${entry.collection}/${entry.id}`}
-  class="not-prose group relative flex flex-nowrap rounded-xl border border-neutral-200/50 bg-white/50 dark:border-neutral-800/50 dark:bg-neutral-900/50 px-5 py-4 transition-all duration-300 ease-out hover:border-primary/50 hover:bg-white dark:hover:bg-neutral-900 shadow-sm hover:shadow-md"
->
-  <div class="flex flex-1 flex-col truncate">
-    <div class="font-bold text-neutral-900 dark:text-neutral-50 group-hover:text-primary transition-colors">
-      {entry.data.title}
+<div class="retro-bevel bg-white dark:bg-[#1a2336] p-2.5 sm:p-3 transition-colors hover:bg-[#ffffea] dark:hover:bg-[#222d44]">
+  <div class="flex items-start justify-between gap-3">
+    <!-- Icon & Title -->
+    <div class="flex items-start gap-2.5 min-w-0 flex-1">
+      <span class="text-xl sm:text-2xl select-none shrink-0 mt-0.5">
+        {isBlog ? "📄" : "💾"}
+      </span>
+      <div class="min-w-0 flex-1">
+        <a
+          href={`/${entry.collection}/${entry.id}`}
+          class="font-bold text-sm sm:text-base text-[#0000cc] dark:text-[#38bdf8] hover:text-[#ff0000] dark:hover:text-[#00ff66] underline hover:bg-yellow-200/50 dark:hover:bg-cyan-950/50 block truncate font-heading"
+        >
+          {entry.data.title}
+        </a>
+        <p class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 mt-1 line-clamp-2 font-retro">
+          {entry.data.description}
+        </p>
+      </div>
     </div>
-    <div class="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-      {entry.data.description}
-    </div>
-  </div>
-  
-  <div class="shrink-0 self-center ml-4">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      class="size-5 fill-none stroke-neutral-400 group-hover:stroke-primary transition-colors duration-300 stroke-2"
+
+    <!-- Action Button -->
+    <a
+      href={`/${entry.collection}/${entry.id}`}
+      class="retro-btn shrink-0 text-xs py-1 px-2.5 font-bold"
     >
-      <line
-        x1="5"
-        y1="12"
-        x2="19"
-        y2="12"
-        class="translate-x-3 scale-x-0 transition-transform duration-300 ease-out group-hover:translate-x-0 group-hover:scale-x-100"
-      ></line>
-      <polyline
-        points="12 5 19 12 12 19"
-        class="-translate-x-1 transition-transform duration-300 ease-out group-hover:translate-x-0"
-      ></polyline>
-    </svg>
+      <span>Open</span>
+      <span>&gt;&gt;</span>
+    </a>
   </div>
-</a>
+
+  <!-- Sunken Metadata Bar -->
+  <div class="mt-2.5 pt-1.5 border-t border-dashed border-[#c0c0c0] dark:border-[#334155] flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-neutral-500 dark:text-neutral-400">
+    <div class="flex items-center gap-2">
+      <span class="font-bold">📅 DATE:</span>
+      <FormattedDate date={entry.data.date} />
+      <span>|</span>
+      <span>DIR: /{entry.collection}/</span>
+    </div>
+    {"tags" in entry.data && entry.data.tags && entry.data.tags.length > 0 && (
+      <div class="flex items-center gap-1 overflow-hidden">
+        {entry.data.tags.slice(0, 3).map((tag: string) => (
+          <span class="px-1 bg-[#e0ded8] dark:bg-[#0f172a] border border-[#808080] text-[10px]">
+            #{tag}
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
+</div>

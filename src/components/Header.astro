@@ -1,47 +1,78 @@
 ---
-import Container from "@components/Container.astro";
-import Link from "@components/Link.astro";
 import { SITE } from "@consts";
 ---
 
-<header transition:persist class="animate">
-  <Container>
-    <div class="block text-center text-lg sm:flex flex-wrap items-center justify-between gap-y-4">
-      <Link href="/" underline={false} class="group">
-        <div class="pb-5 sm:pb-0 font-bold text-xl tracking-tighter text-neutral-900 dark:text-neutral-50 transition-colors group-hover:text-primary dark:group-hover:text-primary-dark">
-          {SITE.TITLE}&nbsp;<span class="inline-block transition-transform group-hover:rotate-12 group-hover:scale-110">🤖️</span>
+<header transition:persist class="border-b-2 border-[#808080] dark:border-[#334155] bg-[#e0ded8] dark:bg-[#151c2c]">
+  <!-- Top Banner Section -->
+  <div class="px-3 py-4 sm:py-5 text-center bg-gradient-to-b from-[#f5f3ec] to-[#e4e0d8] dark:from-[#1a2336] dark:to-[#111726] border-b border-[#808080] dark:border-[#1e293b]">
+    <div class="flex flex-col items-center justify-center gap-1">
+      <a href="/" class="no-underline group hover:bg-transparent">
+        <div class="flex items-center justify-center gap-2">
+          <span class="text-2xl sm:text-3xl select-none group-hover:rotate-12 transition-transform">🤖</span>
+          <h1 class="text-2xl sm:text-4xl font-extrabold tracking-wider font-heading uppercase text-[#0a246a] dark:text-[#38bdf8] drop-shadow-[2px_2px_0px_#ffffff] dark:drop-shadow-[2px_2px_0px_#000000]">
+            {SITE.TITLE}
+          </h1>
+          <span class="text-2xl sm:text-3xl select-none group-hover:-rotate-12 transition-transform">⚡</span>
         </div>
-      </Link>
-      
-      <nav class="flex items-center justify-center gap-2 sm:gap-4 font-medium">
-        <div class="flex items-center gap-1 sm:gap-2">
-          <Link href="/blog" class="px-2 py-1 hover:text-primary dark:hover:text-primary-dark transition-colors">blog</Link>
-          <span class="text-neutral-300 dark:text-neutral-700">/</span>
-          <Link href="/tags" class="px-2 py-1 hover:text-primary dark:hover:text-primary-dark transition-colors">tags</Link>
-          <span class="text-neutral-300 dark:text-neutral-700">/</span>
-          <Link href="/projects" class="px-2 py-1 hover:text-primary dark:hover:text-primary-dark transition-colors">projects</Link>
-        </div>
-
-        <button
-          id="magnifying-glass"
-          aria-label="Search"
-          class="flex items-center justify-center rounded-full size-10 bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:bg-primary/10 hover:text-primary transition-all duration-300 border border-transparent hover:border-primary/20"
-        >
-          <svg
-            height="18"
-            stroke-linejoin="round"
-            viewBox="0 0 16 16"
-            width="18"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            class="transition-transform group-hover:scale-110"
-          >
-            <circle cx="7" cy="7" r="5" />
-            <path d="M11 11L15 15" stroke-linecap="round" />
-          </svg>
-        </button>
-      </nav>
+      </a>
+      <p class="font-pixel text-sm sm:text-base tracking-widest text-[#555] dark:text-[#94a3b8] uppercase font-bold mt-1">
+        ~*~ Personal Cyberspace • Linux Lab • Software & Thoughts ~*~
+      </p>
     </div>
-  </Container>
+  </div>
+
+  <!-- Beveled Toolbar Navigation -->
+  <div class="px-2 py-1.5 bg-[#d4d0c8] dark:bg-[#1e293b] flex flex-wrap items-center justify-between gap-1.5 border-t border-white dark:border-[#334155]">
+    <nav class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+      <a href="/" class="retro-btn">
+        <span class="text-sm">🏠</span>
+        <span>Home</span>
+      </a>
+      <a href="/blog" class="retro-btn">
+        <span class="text-sm">📓</span>
+        <span>Blog</span>
+      </a>
+      <a href="/tags" class="retro-btn">
+        <span class="text-sm">🏷️</span>
+        <span>Tags</span>
+      </a>
+      <a href="/projects" class="retro-btn">
+        <span class="text-sm">💾</span>
+        <span>Projects</span>
+      </a>
+      <a href="/rss.xml" class="retro-btn">
+        <span class="text-sm">📡</span>
+        <span>RSS</span>
+      </a>
+    </nav>
+
+    <!-- Search Button (Keeps #magnifying-glass ID for Pagefind modal) -->
+    <button
+      id="magnifying-glass"
+      aria-label="Search"
+      class="retro-btn font-mono text-xs flex items-center gap-1.5 bg-[#e8e4dc] dark:bg-[#0f172a]"
+      title="Search (Hotkey: / or Ctrl+K)"
+    >
+      <svg
+        height="14"
+        stroke-linejoin="round"
+        viewBox="0 0 16 16"
+        width="14"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="7" cy="7" r="5" />
+        <path d="M11 11L15 15" stroke-linecap="round" />
+      </svg>
+      <span>Find (Ctrl+K)</span>
+    </button>
+  </div>
+
+  <!-- Classic Running Marquee Ticker -->
+  <div class="retro-marquee-wrapper border-y border-[#808080] dark:border-[#334155] select-none">
+    <marquee behavior="scroll" direction="left" scrollamount="5" class="py-0.5">
+      ★★★ WELCOME TO NAWASAN'S HOMEPAGE ★★★ BEST VIEWED AT 1024x768 WITH 16-BIT COLOR ★★★ PROUD LINUX WORKSTATION USER ★★★ CHECK OUT MY BLOG POSTS & PROJECTS BELOW! ★★★
+    </marquee>
+  </div>
 </header>
