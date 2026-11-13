@@ -1,0 +1,1586 @@
+---
+import { getCollection } from "astro:content";
+import { SITE, SOCIALS } from "@consts";
+import { readingTime } from "@lib/utils";
+
+const blogPosts = (await getCollection("blog", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .map((post) => ({
+    id: post.id,
+    title: post.data.title,
+    description: post.data.description,
+    date: post.data.date.toISOString().split("T")[0],
+    tags: post.data.tags || [],
+    readingTime: post.body ? readingTime(post.body) : "1 min read",
+    url: `/blog/${post.id}`,
+  }));
+
+const projects = (await getCollection("projects", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .map((p) => ({
+    id: p.id,
+    title: p.data.title,
+    description: p.data.description,
+    date: p.data.date.toISOString().split("T")[0],
+    demoURL: p.data.demoURL || null,
+    repoURL: p.data.repoURL || null,
+    url: `/projects/${p.id}`,
+  }));
+
+const tagMap: Record<string, number> = {};
+for (const post of blogPosts) {
+  for (const tag of post.tags) {
+    tagMap[tag] = (tagMap[tag] || 0) + 1;
+  }
+}
+
+const tags = Object.entries(tagMap).map(([tag, count]) => ({
+  name: tag,
+  count,
+  url: `/tags/${tag}`,
+}));
+
+const cliPayload = {
+  blog: blogPosts,
+  projects,
+  tags,
+  site: SITE,
+  socials: SOCIALS,
+};
+---
+
+<!-- CLI Modal Container with Astro View Transitions Persistence -->
+<aside id="cli-modal" transition:persist class="hidden" data-pagefind-ignore>
+  <div
+    id="cli-backdrop"
+    class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/65 backdrop-blur-xs select-none"
+  >
+    <div
+      id="cli-window"
+      class="retro-window w-full max-w-3xl flex flex-col shadow-2xl overflow-hidden h-[82vh] max-h-[660px]"
+    >
+      <!-- Titlebar -->
+      <div
+        id="cli-titlebar"
+        class="retro-titlebar px-2.5 py-1 text-xs sm:text-sm font-bold flex items-center justify-between select-none border-b border-[#404040]"
+      >
+        <div class="flex items-center gap-2 truncate">
+          <span class="text-sm">📟</span>
+          <span class="truncate font-mono">MS-DOS Prompt - nawasan@cyberhome: <span id="cli-title-path">~</span> (sh)</span>
+        </div>
+        <div class="flex items-center gap-1 shrink-0 ml-2">
+          <button id="cli-min-btn" class="retro-win-ctrl-btn" title="Minimize to dock" aria-label="Minimize">_</button>
+          <button id="cli-max-btn" class="retro-win-ctrl-btn" title="Toggle Maximize" aria-label="Maximize">□</button>
+          <button id="cli-close-btn" class="retro-win-ctrl-btn retro-win-ctrl-close" title="Close Terminal (Esc)" aria-label="Close">✕</button>
+        </div>
+      </div>
+
+      <!-- Quick Toolbar -->
+      <div class="flex items-center justify-between px-2 py-1 text-[11px] bg-[#d4d0c8] dark:bg-[#1a2234] border-b border-[#808080] font-retro text-neutral-700 dark:text-neutral-300">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-[#0a246a] dark:text-[#38bdf8]">SESSION:</span>
+          <span class="font-mono">guest@cyberhome</span>
+          <span class="text-neutral-400">|</span>
+          <span class="hidden sm:inline font-mono">VT100 80x25</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <button class="cli-quick-btn retro-btn text-[10px] py-0 px-1.5" data-cmd="help">help</button>
+          <button class="cli-quick-btn retro-btn text-[10px] py-0 px-1.5" data-cmd="ls">ls</button>
+          <button class="cli-quick-btn retro-btn text-[10px] py-0 px-1.5" data-cmd="tree">tree</button>
+          <button class="cli-quick-btn retro-btn text-[10px] py-0 px-1.5" data-cmd="neofetch">fetch</button>
+          <button class="cli-quick-btn retro-btn text-[10px] py-0 px-1.5" data-cmd="clear">clear</button>
+        </div>
+      </div>
+
+      <!-- Terminal Body / Output & Prompt Screen -->
+      <div
+        id="cli-screen"
+        class="flex-1 bg-[#0b1017] text-[#e2e8f0] p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-y-auto leading-relaxed retro-bevel-inset focus:outline-none select-text"
+        tabindex="0"
+      >
+        <!-- Dynamic terminal log lines will be appended here -->
+        <div id="cli-output" class="space-y-2"></div>
+
+        <!-- Active Input Line -->
+        <div id="cli-input-line" class="flex items-center gap-1.5 mt-2">
+          <span id="cli-prompt-label" class="font-bold text-emerald-400 shrink-0 select-none">
+            nawasan@cyberhome:<span class="text-sky-400">~</span>$&nbsp;
+          </span>
+          <input
+            id="cli-input"
+            type="text"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            class="flex-1 bg-transparent border-none outline-none text-[#00ff66] font-mono text-xs sm:text-sm p-0 m-0 caret-[#00ff66]"
+          />
+        </div>
+      </div>
+
+      <!-- Terminal Status / Bottom Helper Bar -->
+      <div class="flex items-center justify-between px-2 py-1 text-[11px] font-mono bg-[#d4d0c8] dark:bg-[#1a2234] border-t border-[#808080] text-neutral-700 dark:text-neutral-300 select-none">
+        <div class="flex items-center gap-2 truncate">
+          <span class="retro-bevel-inset px-1 py-0.2 bg-white/60 dark:bg-black/30 text-[10px] font-bold">READY</span>
+          <span class="hidden md:inline text-neutral-600 dark:text-neutral-400">
+            [Tab] Autocomplete • [↑↓] History • [Ctrl+L] Clear • 'help' for manual
+          </span>
+          <span class="md:hidden text-neutral-600 dark:text-neutral-400">
+            [Tab] Complete • 'help'
+          </span>
+        </div>
+        <div class="shrink-0 flex items-center gap-1">
+          <span class="retro-bevel-inset px-1 py-0.2 bg-white/60 dark:bg-black/30 text-emerald-700 dark:text-emerald-400 font-bold text-[10px]">
+            ● ONLINE
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Minimized Floating Dock Button -->
+  <div
+    id="cli-minimized-dock"
+    class="fixed bottom-3 right-3 z-50 hidden"
+  >
+    <button
+      id="cli-restore-btn"
+      class="retro-btn flex items-center gap-2 px-3 py-1.5 shadow-2xl font-mono text-xs bg-[#ece9d8] dark:bg-[#1a2336] border-2 border-emerald-500 font-bold"
+      title="Restore CLI Terminal"
+    >
+      <span class="text-emerald-600 dark:text-emerald-400 font-bold text-sm">&gt;_</span>
+      <span>Terminal [Minimized]</span>
+      <span class="text-[10px] text-neutral-500 hidden sm:inline">(Click to restore)</span>
+    </button>
+  </div>
+</aside>
+
+<!-- Embedded Data Payload for Client Terminal Script -->
+<script id="cli-data-source" type="application/json" set:html={JSON.stringify(cliPayload)} />
+
+<script is:inline>
+  (function setupCliSystem() {
+    // Prevent duplicate initializations across view transitions
+    if (window.__CLI_INITIALIZED__) return;
+    window.__CLI_INITIALIZED__ = true;
+
+    // Load data from JSON tag
+    let cliData = { blog: [], projects: [], tags: [], site: {}, socials: [] };
+    try {
+      const dataScript = document.getElementById("cli-data-source");
+      if (dataScript && dataScript.textContent) {
+        cliData = JSON.parse(dataScript.textContent);
+      }
+    } catch (e) {
+      console.error("Failed to parse CLI data:", e);
+    }
+
+    // CLI Internal State
+    let cwd = "~"; // '~', '~/blog', '~/projects', '~/tags'
+    const commandHistory = [];
+    let historyIndex = -1;
+    let tempDraftInput = "";
+    let isMaximized = false;
+    let hasShownWelcome = false;
+
+    // Virtual Text Files
+    const virtualFiles = {
+      "about.txt": `NAME: ณวสันต์ (Nawasan)
+HANDLE: ZocketZero
+ROLE: Software Developer & Linux Enthusiast
+PRIMARY OS: Kali Linux (Rolling Release)
+
+BIOGRAPHY:
+Welcome to my personal cyberspace! I am a software developer with a
+strong enthusiasm for open-source systems, web technologies, and
+performance-oriented applications.
+
+Most of my projects and codebases are built and tested on Linux
+workstations (Kali Linux), aiming for efficiency, clean architecture,
+and robust cross-platform capability.
+
+In my blog, I write about computing concepts, developer tools,
+operating systems, and practical programming insights.`,
+
+      "contact.txt": `CONTACT INFORMATION & SOCIAL NETWORKS:
+-------------------------------------------------------------
+EMAIL:    ${cliData.site.EMAIL || "zocketzero@proton.me"}
+GITHUB:   https://github.com/ZocketZero
+WEBSITE:  https://nawasan.dev
+LINKEDIN: https://www.linkedin.com/in/nawasan/
+-------------------------------------------------------------
+Tip: Type 'open github' or 'open linkedin' to visit in your browser!`,
+
+      "skills.txt": `TECHNICAL SKILLS & TOOLBOX:
+-------------------------------------------------------------
+• Languages:    TypeScript, JavaScript, Python, C/C++, HTML5, CSS3, SQL
+• Frameworks:   Astro, React, Tailwind CSS, Vite, Node.js
+• Platform:     Kali Linux, Linux CLI, Bash, Git, Neovim, Docker
+• Specialties:  Static Site Architecture, Performance, Retro Web UI
+-------------------------------------------------------------`,
+
+      "readme.txt": `=============================================================
+NAWASAN'S CYBERHOME RETRO CLI (v1.0)
+=============================================================
+Welcome to the interactive website command line! This CLI lets
+you navigate pages, browse articles, view project specs, and
+control system settings directly through commands.
+
+COMMON COMMANDS:
+  help             List all available commands and syntax
+  ls [-l]          List directory contents (articles, projects, files)
+  cd <dir>         Change current folder (blog, projects, tags, ..)
+  cat <file>       Show content of a file, article, or project
+  open <target>    Navigate your browser to any page or article
+  search <query>   Search across all blog posts and projects
+  ping <host>      Send ICMP packets to test latency
+  theme <mode>     Change theme (light, dark, system, toggle)
+  neofetch         Display retro system specs and ASCII art
+  clear            Clear the screen
+  exit             Close this terminal window
+
+TIPS:
+  - Press [Tab] to auto-complete commands and file/folder names.
+  - Press [↑] and [↓] to cycle through your command history.
+  - Click on any highlighted link/command to execute it instantly!
+=============================================================`
+    };
+
+    // Helper: Escape HTML
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Modal Control Functions
+    function openCli() {
+      const modal = document.getElementById("cli-modal");
+      const dock = document.getElementById("cli-minimized-dock");
+      const input = document.getElementById("cli-input");
+      const screen = document.getElementById("cli-screen");
+
+      if (!modal) return;
+      modal.classList.remove("hidden");
+      if (dock) dock.classList.add("hidden");
+
+      if (!hasShownWelcome) {
+        showWelcomeMessage();
+        hasShownWelcome = true;
+      }
+
+      setTimeout(() => {
+        input?.focus();
+        if (screen) screen.scrollTop = screen.scrollHeight;
+      }, 50);
+    }
+
+    function closeCli() {
+      const modal = document.getElementById("cli-modal");
+      const dock = document.getElementById("cli-minimized-dock");
+      if (modal) modal.classList.add("hidden");
+      if (dock) dock.classList.add("hidden");
+    }
+
+    function minimizeCli() {
+      const modal = document.getElementById("cli-modal");
+      const dock = document.getElementById("cli-minimized-dock");
+      if (modal) modal.classList.add("hidden");
+      if (dock) dock.classList.remove("hidden");
+    }
+
+    function toggleMaximizeCli() {
+      const win = document.getElementById("cli-window");
+      if (!win) return;
+      isMaximized = !isMaximized;
+      if (isMaximized) {
+        win.classList.remove("max-w-3xl", "h-[82vh]", "max-h-[660px]");
+        win.classList.add("w-full", "h-full", "max-w-none", "max-h-none", "m-0");
+      } else {
+        win.classList.add("max-w-3xl", "h-[82vh]", "max-h-[660px]");
+        win.classList.remove("w-full", "h-full", "max-w-none", "max-h-none", "m-0");
+      }
+    }
+
+    function updatePrompt() {
+      const promptLabel = document.getElementById("cli-prompt-label");
+      const titlePath = document.getElementById("cli-title-path");
+
+      if (promptLabel) {
+        promptLabel.innerHTML = `nawasan@cyberhome:<span class="text-sky-400">${escapeHtml(cwd)}</span>$&nbsp;`;
+      }
+      if (titlePath) {
+        titlePath.textContent = cwd;
+      }
+    }
+
+    function printLine(htmlContent, isError = false) {
+      const output = document.getElementById("cli-output");
+      const screen = document.getElementById("cli-screen");
+      if (!output) return;
+
+      const lineDiv = document.createElement("div");
+      lineDiv.className = isError ? "text-red-400 font-mono" : "font-mono";
+      lineDiv.innerHTML = htmlContent;
+      output.appendChild(lineDiv);
+
+      if (screen) {
+        screen.scrollTop = screen.scrollHeight;
+      }
+    }
+
+    function printCommandHeader(commandText) {
+      const promptPath = cwd;
+      printLine(
+        `<div class="flex items-center gap-1.5 text-neutral-400 select-none">` +
+        `<span class="text-emerald-400 font-bold">nawasan@cyberhome:</span>` +
+        `<span class="text-sky-400">${escapeHtml(promptPath)}</span>$&nbsp;` +
+        `<span class="text-white font-bold">${escapeHtml(commandText)}</span>` +
+        `</div>`
+      );
+    }
+
+    function showWelcomeMessage() {
+      const asciiBanner =
+`<span class="text-emerald-400 font-bold">
+ __  _ _____ _ _ _ _____ _____ _____ _____ 
+|  \\| |  _  | | | |  _  |   __|  _  |   | |
+|     |     | | | |     |__   |     | | | |
+|_|\\__|__|__|_____|__|__|_____|__|__|_|___|
+</span>`;
+
+      printLine(asciiBanner);
+      printLine(
+        `<div class="text-[#a6caf0] dark:text-[#38bdf8] font-bold">` +
+        `Nawasan's CyberHome Terminal [Version 2.0.26]<br/>` +
+        `(C) Copyright Nawasan / ZocketZero. All rights reserved.` +
+        `</div>`
+      );
+      printLine(
+        `<div class="text-neutral-300 mt-1">` +
+        `Welcome to the interactive site shell! Navigate, search, and inspect content.<br/>` +
+        `Type <span class="cli-cmd-link text-yellow-300 font-bold underline cursor-pointer" data-cmd="help">help</span> for a list of commands, ` +
+        `<span class="cli-cmd-link text-yellow-300 font-bold underline cursor-pointer" data-cmd="ls">ls</span> to list files, or ` +
+        `<span class="cli-cmd-link text-yellow-300 font-bold underline cursor-pointer" data-cmd="open blog">open blog</span> to visit the blog.` +
+        `</div>`
+      );
+      printLine(`<div class="border-b border-neutral-700 my-1"></div>`);
+    }
+
+    // Commands Implementation
+    const commands = {
+      help: (args) => {
+        const sub = args[0]?.toLowerCase();
+        if (sub && commandHelpDetails[sub]) {
+          printLine(commandHelpDetails[sub]);
+          return;
+        }
+
+        const helpHtml =
+`<div class="space-y-2">
+  <div class="text-yellow-300 font-bold border-b border-neutral-700 pb-1">AVAILABLE CLI COMMANDS:</div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 text-xs">
+    <div>
+      <span class="text-sky-400 font-bold">NAVIGATION:</span>
+      <ul class="ml-2 space-y-0.5">
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="cd blog">cd &lt;dir&gt;</span> <span class="text-neutral-400">- Change folder (~, blog, projects, tags, ..)</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="pwd">pwd</span> <span class="text-neutral-400">- Print current working directory</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="open blog">open &lt;page&gt;</span> <span class="text-neutral-400">- Navigate to page/post in browser</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="back">back</span> <span class="text-neutral-400">- Go back in browser history</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="reload">reload</span> <span class="text-neutral-400">- Reload the page</span></li>
+      </ul>
+    </div>
+
+    <div>
+      <span class="text-sky-400 font-bold">BROWSING & CONTENT:</span>
+      <ul class="ml-2 space-y-0.5">
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="ls">ls [-l] [dir]</span> <span class="text-neutral-400">- List files and directories</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="tree">tree</span> <span class="text-neutral-400">- Display directory structure</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="cat about.txt">cat &lt;file&gt;</span> <span class="text-neutral-400">- View file, article, or project info</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="search linux">search &lt;query&gt;</span> <span class="text-neutral-400">- Search posts & projects by keyword</span></li>
+      </ul>
+    </div>
+
+    <div>
+      <span class="text-sky-400 font-bold">SYSTEM & TOOLS:</span>
+      <ul class="ml-2 space-y-0.5">
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="theme">theme [mode]</span> <span class="text-neutral-400">- Switch theme (light, dark, toggle)</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="neofetch">neofetch</span> <span class="text-neutral-400">- System info & ASCII logo</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="whoami">whoami</span> <span class="text-neutral-400">- Current user session</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="socials">socials</span> <span class="text-neutral-400">- Links to GitHub, LinkedIn, email</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="ping nawasan.dev">ping &lt;host&gt;</span> <span class="text-neutral-400">- Send ICMP packets to test latency</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="date">date</span> <span class="text-neutral-400">- Show current date and time</span></li>
+      </ul>
+    </div>
+
+    <div>
+      <span class="text-sky-400 font-bold">UTILITIES & FUN:</span>
+      <ul class="ml-2 space-y-0.5">
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="clear">clear</span> <span class="text-neutral-400">- Clear screen (or Ctrl+L)</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="history">history</span> <span class="text-neutral-400">- View command history</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="matrix">matrix</span> <span class="text-neutral-400">- Cyber green falling rain</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="fortune">fortune</span> <span class="text-neutral-400">- Random programmer wisdom</span></li>
+        <li><span class="cli-cmd-link text-emerald-400 font-semibold cursor-pointer underline" data-cmd="exit">exit</span> <span class="text-neutral-400">- Close terminal window</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="text-neutral-400 text-[11px] pt-1 border-t border-neutral-700">
+    Tip: Click on any green command above or press <kbd class="px-1 py-0.2 bg-neutral-800 border border-neutral-600 text-neutral-200">Tab</kbd> to auto-complete!
+  </div>
+</div>`;
+        printLine(helpHtml);
+      },
+
+      pwd: () => {
+        const full = cwd === "~" ? "/home/nawasan" : `/home/nawasan/${cwd.replace(/^~\/?/, "")}`;
+        printLine(`<span class="text-sky-300 font-mono">${escapeHtml(full)}</span>`);
+      },
+
+      cd: (args) => {
+        const target = (args[0] || "~").trim();
+        const shouldGo = args.includes("-g") || args.includes("--go");
+
+        // cd ~ or cd / or cd
+        if (target === "~" || target === "/" || target === "") {
+          cwd = "~";
+          updatePrompt();
+          printLine(`<span class="text-neutral-400">Changed directory to <span class="text-sky-300">~</span></span>`);
+          if (shouldGo) window.location.href = "/";
+          return;
+        }
+
+        // cd ..
+        if (target === ".." || target === "../") {
+          if (cwd !== "~") {
+            cwd = "~";
+            updatePrompt();
+            printLine(`<span class="text-neutral-400">Changed directory to <span class="text-sky-300">~</span></span>`);
+          } else {
+            printLine(`<span class="text-neutral-400">Already at root directory (~)</span>`);
+          }
+          return;
+        }
+
+        const normalized = target.replace(/^\/+/, "").replace(/\/+$/, "");
+
+        // cd blog
+        if (normalized === "blog") {
+          cwd = "~/blog";
+          updatePrompt();
+          printLine(
+            `<span class="text-neutral-400">Switched directory to <span class="text-sky-300">~/blog</span>. ` +
+            `Type <span class="cli-cmd-link text-yellow-300 underline cursor-pointer" data-cmd="ls">ls</span> to view posts or ` +
+            `<span class="cli-cmd-link text-yellow-300 underline cursor-pointer" data-cmd="open blog">open blog</span> to visit.</span>`
+          );
+          if (shouldGo) window.location.href = "/blog";
+          return;
+        }
+
+        // cd projects
+        if (normalized === "projects") {
+          cwd = "~/projects";
+          updatePrompt();
+          printLine(
+            `<span class="text-neutral-400">Switched directory to <span class="text-sky-300">~/projects</span>. ` +
+            `Type <span class="cli-cmd-link text-yellow-300 underline cursor-pointer" data-cmd="ls">ls</span> to view projects or ` +
+            `<span class="cli-cmd-link text-yellow-300 underline cursor-pointer" data-cmd="open projects">open projects</span> to visit.</span>`
+          );
+          if (shouldGo) window.location.href = "/projects";
+          return;
+        }
+
+        // cd tags
+        if (normalized === "tags") {
+          cwd = "~/tags";
+          updatePrompt();
+          printLine(
+            `<span class="text-neutral-400">Switched directory to <span class="text-sky-300">~/tags</span>. ` +
+            `Type <span class="cli-cmd-link text-yellow-300 underline cursor-pointer" data-cmd="ls">ls</span> to view tags.</span>`
+          );
+          if (shouldGo) window.location.href = "/tags";
+          return;
+        }
+
+        // Check if user is trying to cd into a post
+        const matchingPost = cliData.blog.find(
+          (p) => p.id === normalized || `${p.id}.md` === normalized
+        );
+        if (matchingPost) {
+          printLine(
+            `<span class="text-yellow-300">'${escapeHtml(normalized)}' is an article, not a directory.</span><br/>` +
+            `Type <span class="cli-cmd-link text-emerald-400 underline cursor-pointer" data-cmd="cat ${matchingPost.id}">cat ${matchingPost.id}</span> to read preview, or ` +
+            `<span class="cli-cmd-link text-emerald-400 underline cursor-pointer" data-cmd="open ${matchingPost.id}">open ${matchingPost.id}</span> to navigate to it.`
+          );
+          return;
+        }
+
+        // Check if user is trying to cd into a file
+        if (virtualFiles[normalized]) {
+          printLine(
+            `<span class="text-yellow-300">'${escapeHtml(normalized)}' is a text file.</span> ` +
+            `Use <span class="cli-cmd-link text-emerald-400 underline cursor-pointer" data-cmd="cat ${normalized}">cat ${normalized}</span> to view its content.`
+          );
+          return;
+        }
+
+        printLine(`cd: no such file or directory: ${escapeHtml(target)}`, true);
+      },
+
+      ls: (args) => {
+        const isLong = args.includes("-l");
+        const dirArg = args.find((a) => !a.startsWith("-"));
+        let targetDir = cwd;
+
+        if (dirArg) {
+          if (dirArg === "blog" || dirArg === "~/blog") targetDir = "~/blog";
+          else if (dirArg === "projects" || dirArg === "~/projects") targetDir = "~/projects";
+          else if (dirArg === "tags" || dirArg === "~/tags") targetDir = "~/tags";
+          else if (dirArg === "~" || dirArg === "/") targetDir = "~";
+          else {
+            printLine(`ls: cannot access '${escapeHtml(dirArg)}': No such file or directory`, true);
+            return;
+          }
+        }
+
+        if (targetDir === "~") {
+          // List root
+          if (isLong) {
+            let out =
+`<div class="space-y-1">
+  <div class="text-neutral-400">total 7</div>
+  <div>drwxr-xr-x 2 zero zero 4096 <span class="cli-cmd-link text-cyan-400 font-bold cursor-pointer underline" data-cmd="cd blog">blog/</span> <span class="text-neutral-400">(${cliData.blog.length} articles)</span></div>
+  <div>drwxr-xr-x 2 zero zero 4096 <span class="cli-cmd-link text-cyan-400 font-bold cursor-pointer underline" data-cmd="cd projects">projects/</span> <span class="text-neutral-400">(${cliData.projects.length} repositories)</span></div>
+  <div>drwxr-xr-x 2 zero zero 4096 <span class="cli-cmd-link text-cyan-400 font-bold cursor-pointer underline" data-cmd="cd tags">tags/</span> <span class="text-neutral-400">(${cliData.tags.length} categories)</span></div>
+  <div>-rw-r--r-- 1 zero zero 1024 <span class="cli-cmd-link text-emerald-300 cursor-pointer underline" data-cmd="cat about.txt">about.txt</span></div>
+  <div>-rw-r--r-- 1 zero zero  512 <span class="cli-cmd-link text-emerald-300 cursor-pointer underline" data-cmd="cat contact.txt">contact.txt</span></div>
+  <div>-rw-r--r-- 1 zero zero  768 <span class="cli-cmd-link text-emerald-300 cursor-pointer underline" data-cmd="cat skills.txt">skills.txt</span></div>
+  <div>-rw-r--r-- 1 zero zero 1200 <span class="cli-cmd-link text-emerald-300 cursor-pointer underline" data-cmd="cat readme.txt">readme.txt</span></div>
+</div>`;
+            printLine(out);
+          } else {
+            let out =
+`<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+  <div><span class="cli-cmd-link text-cyan-400 font-bold cursor-pointer underline" data-cmd="cd blog">📁 blog/</span></div>
+  <div><span class="cli-cmd-link text-cyan-400 font-bold cursor-pointer underline" data-cmd="cd projects">📁 projects/</span></div>
+  <div><span class="cli-cmd-link text-cyan-400 font-bold cursor-pointer underline" data-cmd="cd tags">📁 tags/</span></div>
+  <div><span class="cli-cmd-link text-emerald-300 cursor-pointer underline" data-cmd="cat about.txt">📄 about.txt</span></div>
+  <div><span class="cli-cmd-link text-emerald-300 cursor-pointer underline" data-cmd="cat contact.txt">📄 contact.txt</span></div>
+  <div><span class="cli-cmd-link text-emerald-300 cursor-pointer underline" data-cmd="cat skills.txt">📄 skills.txt</span></div>
+  <div><span class="cli-cmd-link text-emerald-300 cursor-pointer underline" data-cmd="cat readme.txt">📄 readme.txt</span></div>
+</div>`;
+            printLine(out);
+          }
+        } else if (targetDir === "~/blog") {
+          // List blog posts
+          if (cliData.blog.length === 0) {
+            printLine(`<span class="text-neutral-400">(no articles found)</span>`);
+            return;
+          }
+
+          let out = `<div class="space-y-1.5"><div class="text-neutral-400">C:\\ARTICLES\\*.* (${cliData.blog.length} posts):</div>`;
+          cliData.blog.forEach((post) => {
+            const tagsFormatted = post.tags.map((t) => `#${t}`).join(" ");
+            out +=
+              `<div class="border-b border-neutral-800 pb-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">` +
+              `<div>` +
+              `<span class="text-neutral-400 text-xs">${post.date}</span> ` +
+              `<span class="cli-cmd-link text-emerald-300 font-bold cursor-pointer underline" data-cmd="cat ${post.id}">📄 ${escapeHtml(post.id)}.md</span> ` +
+              `<span class="text-white">- ${escapeHtml(post.title)}</span>` +
+              `</div>` +
+              `<div class="text-xs text-neutral-400 flex items-center gap-2">` +
+              `<span class="text-sky-400">${tagsFormatted}</span>` +
+              `<button class="cli-cmd-link retro-btn text-[10px] py-0 px-1" data-cmd="open ${post.id}">open</button>` +
+              `</div>` +
+              `</div>`;
+          });
+          out += `</div>`;
+          printLine(out);
+        } else if (targetDir === "~/projects") {
+          // List projects
+          if (cliData.projects.length === 0) {
+            printLine(`<span class="text-neutral-400">(no projects found)</span>`);
+            return;
+          }
+
+          let out = `<div class="space-y-1.5"><div class="text-neutral-400">C:\\SOFTWARE\\*.* (${cliData.projects.length} projects):</div>`;
+          cliData.projects.forEach((proj) => {
+            out +=
+              `<div class="border-b border-neutral-800 pb-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">` +
+              `<div>` +
+              `<span class="text-neutral-400 text-xs">${proj.date}</span> ` +
+              `<span class="cli-cmd-link text-yellow-300 font-bold cursor-pointer underline" data-cmd="cat ${proj.id}">💾 ${escapeHtml(proj.id)}.exe</span> ` +
+              `<span class="text-white">- ${escapeHtml(proj.title)}</span>` +
+              `</div>` +
+              `<div class="text-xs text-neutral-400 flex items-center gap-2">` +
+              `<button class="cli-cmd-link retro-btn text-[10px] py-0 px-1" data-cmd="open ${proj.id}">open</button>` +
+              `</div>` +
+              `</div>`;
+          });
+          out += `</div>`;
+          printLine(out);
+        } else if (targetDir === "~/tags") {
+          let out = `<div class="space-y-1"><div class="text-neutral-400">CATEGORIES (${cliData.tags.length}):</div><div class="flex flex-wrap gap-2">`;
+          cliData.tags.forEach((tag) => {
+            out +=
+              `<span class="cli-cmd-link retro-btn text-xs py-0.5 px-1.5 cursor-pointer" data-cmd="open tag:${tag.name}">` +
+              `🏷️ #${escapeHtml(tag.name)} (${tag.count})` +
+              `</span>`;
+          });
+          out += `</div></div>`;
+          printLine(out);
+        }
+      },
+
+      dir: (args) => {
+        // Alias to ls
+        commands.ls(args);
+      },
+
+      list: (args) => {
+        // Alias to ls
+        commands.ls(args);
+      },
+
+      tree: () => {
+        let treeHtml =
+`<div class="font-mono text-neutral-300 leading-tight">
+<span class="text-sky-400 font-bold">.</span><br/>
+├── <span class="text-cyan-400 font-bold">blog/</span><br/>`;
+
+        cliData.blog.forEach((post, i) => {
+          const isLast = i === cliData.blog.length - 1;
+          const prefix = isLast ? "│   └── " : "│   ├── ";
+          treeHtml += `${prefix}<span class="cli-cmd-link text-emerald-300 cursor-pointer underline" data-cmd="cat ${post.id}">${escapeHtml(post.id)}.md</span><br/>`;
+        });
+
+        treeHtml += `├── <span class="text-cyan-400 font-bold">projects/</span><br/>`;
+        cliData.projects.forEach((proj, i) => {
+          const isLast = i === cliData.projects.length - 1;
+          const prefix = isLast ? "│   └── " : "│   ├── ";
+          treeHtml += `${prefix}<span class="cli-cmd-link text-yellow-300 cursor-pointer underline" data-cmd="cat ${proj.id}">${escapeHtml(proj.id)}.exe</span><br/>`;
+        });
+
+        treeHtml +=
+`├── <span class="text-cyan-400 font-bold">tags/</span><br/>
+├── <span class="cli-cmd-link text-emerald-300 cursor-pointer underline" data-cmd="cat about.txt">about.txt</span><br/>
+├── <span class="cli-cmd-link text-emerald-300 cursor-pointer underline" data-cmd="cat contact.txt">contact.txt</span><br/>
+├── <span class="cli-cmd-link text-emerald-300 cursor-pointer underline" data-cmd="cat skills.txt">skills.txt</span><br/>
+└── <span class="cli-cmd-link text-emerald-300 cursor-pointer underline" data-cmd="cat readme.txt">readme.txt</span><br/>
+<br/>
+<span class="text-neutral-400">3 directories, ${cliData.blog.length + cliData.projects.length + 4} files</span>
+</div>`;
+        printLine(treeHtml);
+      },
+
+      cat: (args) => {
+        if (!args || args.length === 0) {
+          printLine("cat: missing file operand. Usage: cat <filename>", true);
+          return;
+        }
+
+        const raw = args[0].trim();
+        const target = raw.replace(/^\/+/, "").replace(/\.md$/, "");
+
+        // 1. Virtual files
+        if (virtualFiles[raw] || virtualFiles[target] || virtualFiles[`${target}.txt`]) {
+          const content = virtualFiles[raw] || virtualFiles[target] || virtualFiles[`${target}.txt`];
+          printLine(`<pre class="text-neutral-200 whitespace-pre-wrap font-mono">${escapeHtml(content)}</pre>`);
+          return;
+        }
+
+        // 2. Blog posts
+        const post = cliData.blog.find(
+          (p) => p.id.toLowerCase() === target.toLowerCase() || p.id.toLowerCase() === raw.toLowerCase()
+        );
+        if (post) {
+          const tagsHtml = post.tags.map((t) => `<span class="text-sky-400">#${escapeHtml(t)}</span>`).join(" ");
+          const cardHtml =
+`<div class="retro-bevel p-2 bg-[#162032] border border-[#38bdf8] space-y-2">
+  <div class="text-sky-300 font-bold text-sm flex items-center justify-between border-b border-sky-900 pb-1">
+    <span>📄 ${escapeHtml(post.title)}</span>
+    <span class="text-neutral-400 text-xs">${post.date}</span>
+  </div>
+  <div class="text-xs text-neutral-400">
+    Estimated reading time: <span class="text-yellow-300">${post.readingTime}</span> | Categories: ${tagsHtml}
+  </div>
+  <div class="text-neutral-200 text-xs sm:text-sm">
+    ${escapeHtml(post.description)}
+  </div>
+  <div class="pt-2 border-t border-neutral-700 flex items-center justify-between">
+    <span class="text-neutral-400 text-xs">File: /blog/${escapeHtml(post.id)}</span>
+    <button class="cli-cmd-link retro-btn text-xs py-0.5 px-2 bg-emerald-900 text-emerald-200" data-cmd="open ${post.id}">
+      👉 Read Full Article [Enter]
+    </button>
+  </div>
+</div>`;
+          printLine(cardHtml);
+          return;
+        }
+
+        // 3. Projects
+        const project = cliData.projects.find(
+          (p) => p.id.toLowerCase() === target.toLowerCase() || p.id.toLowerCase() === raw.toLowerCase()
+        );
+        if (project) {
+          const cardHtml =
+`<div class="retro-bevel p-2 bg-[#162032] border border-yellow-500 space-y-2">
+  <div class="text-yellow-300 font-bold text-sm flex items-center justify-between border-b border-yellow-900 pb-1">
+    <span>💾 ${escapeHtml(project.title)}</span>
+    <span class="text-neutral-400 text-xs">${project.date}</span>
+  </div>
+  <div class="text-neutral-200 text-xs sm:text-sm">
+    ${escapeHtml(project.description)}
+  </div>
+  <div class="pt-2 border-t border-neutral-700 flex flex-wrap items-center justify-between gap-2">
+    <div class="flex items-center gap-2 text-xs">
+      ${project.demoURL ? `<a href="${project.demoURL}" target="_blank" class="text-yellow-300 underline">🚀 Live Demo</a>` : ""}
+      ${project.repoURL ? `<a href="${project.repoURL}" target="_blank" class="text-sky-400 underline">📦 GitHub Repo</a>` : ""}
+    </div>
+    <button class="cli-cmd-link retro-btn text-xs py-0.5 px-2 bg-sky-900 text-sky-200" data-cmd="open ${project.id}">
+      👉 View Project Page
+    </button>
+  </div>
+</div>`;
+          printLine(cardHtml);
+          return;
+        }
+
+        printLine(`cat: ${escapeHtml(raw)}: No such file. Try 'ls' to list files.`, true);
+      },
+
+      show: (args) => {
+        // Alias to cat
+        commands.cat(args);
+      },
+
+      view: (args) => {
+        // Alias to cat
+        commands.cat(args);
+      },
+
+      open: (args) => {
+        if (!args || args.length === 0) {
+          // If in subfolder, open that subfolder
+          if (cwd === "~/blog") {
+            window.location.href = "/blog";
+            return;
+          }
+          if (cwd === "~/projects") {
+            window.location.href = "/projects";
+            return;
+          }
+          if (cwd === "~/tags") {
+            window.location.href = "/tags";
+            return;
+          }
+          printLine("open: specify a page, post, or project (e.g. 'open blog', 'open projects', 'open linux', 'open github')", true);
+          return;
+        }
+
+        const raw = args[0].trim();
+        const target = raw.toLowerCase().replace(/^\/+/, "");
+
+        if (target === "home" || target === "~" || target === "index") {
+          printLine(`<span class="text-emerald-400">Navigating to Home (/) ...</span>`);
+          window.location.href = "/";
+          return;
+        }
+
+        if (target === "blog") {
+          printLine(`<span class="text-emerald-400">Navigating to Blog (/blog) ...</span>`);
+          window.location.href = "/blog";
+          return;
+        }
+
+        if (target === "projects") {
+          printLine(`<span class="text-emerald-400">Navigating to Projects (/projects) ...</span>`);
+          window.location.href = "/projects";
+          return;
+        }
+
+        if (target === "tags") {
+          printLine(`<span class="text-emerald-400">Navigating to Tags (/tags) ...</span>`);
+          window.location.href = "/tags";
+          return;
+        }
+
+        if (target === "rss" || target === "rss.xml") {
+          printLine(`<span class="text-emerald-400">Navigating to RSS feed ...</span>`);
+          window.location.href = "/rss.xml";
+          return;
+        }
+
+        if (target === "github") {
+          printLine(`<span class="text-emerald-400">Opening GitHub in new window ...</span>`);
+          window.open("https://github.com/ZocketZero", "_blank");
+          return;
+        }
+
+        if (target === "linkedin") {
+          printLine(`<span class="text-emerald-400">Opening LinkedIn in new window ...</span>`);
+          window.open("https://www.linkedin.com/in/nawasan/", "_blank");
+          return;
+        }
+
+        if (target.startsWith("tag:")) {
+          const tagName = target.replace(/^tag:/, "");
+          printLine(`<span class="text-emerald-400">Navigating to tag #${escapeHtml(tagName)} ...</span>`);
+          window.location.href = `/tags/${encodeURIComponent(tagName)}`;
+          return;
+        }
+
+        // Check blog posts
+        const post = cliData.blog.find(
+          (p) => p.id.toLowerCase() === target || `${p.id}.md`.toLowerCase() === target
+        );
+        if (post) {
+          printLine(`<span class="text-emerald-400">Navigating to article: ${escapeHtml(post.title)} ...</span>`);
+          window.location.href = post.url;
+          return;
+        }
+
+        // Check projects
+        const project = cliData.projects.find(
+          (p) => p.id.toLowerCase() === target || `${p.id}.exe`.toLowerCase() === target
+        );
+        if (project) {
+          printLine(`<span class="text-emerald-400">Navigating to project: ${escapeHtml(project.title)} ...</span>`);
+          window.location.href = project.url;
+          return;
+        }
+
+        // Check tags
+        const tag = cliData.tags.find((t) => t.name.toLowerCase() === target);
+        if (tag) {
+          printLine(`<span class="text-emerald-400">Navigating to tag #${escapeHtml(tag.name)} ...</span>`);
+          window.location.href = tag.url;
+          return;
+        }
+
+        printLine(`open: cannot find target '${escapeHtml(raw)}'. Type 'ls' or 'search' to locate pages.`, true);
+      },
+
+      goto: (args) => {
+        // Alias to open
+        commands.open(args);
+      },
+
+      navigate: (args) => {
+        // Alias to open
+        commands.open(args);
+      },
+
+      back: () => {
+        printLine(`<span class="text-neutral-400">Navigating back...</span>`);
+        window.history.back();
+      },
+
+      reload: () => {
+        printLine(`<span class="text-neutral-400">Reloading page...</span>`);
+        window.location.reload();
+      },
+
+      search: (args) => {
+        if (!args || args.length === 0) {
+          printLine("search: query string required. Usage: search <keyword>", true);
+          return;
+        }
+
+        const query = args.join(" ").toLowerCase();
+        const matchingPosts = cliData.blog.filter(
+          (p) =>
+            p.title.toLowerCase().includes(query) ||
+            p.description.toLowerCase().includes(query) ||
+            p.tags.some((t) => t.toLowerCase().includes(query))
+        );
+
+        const matchingProjects = cliData.projects.filter(
+          (p) =>
+            p.title.toLowerCase().includes(query) ||
+            p.description.toLowerCase().includes(query)
+        );
+
+        const total = matchingPosts.length + matchingProjects.length;
+        if (total === 0) {
+          printLine(`<span class="text-neutral-400">No results found for query: '<span class="text-white">${escapeHtml(query)}</span>'</span>`);
+          return;
+        }
+
+        let out = `<div class="space-y-2"><div class="text-yellow-300 font-bold">FOUND ${total} RESULT${total > 1 ? "S" : ""} FOR '${escapeHtml(query)}':</div>`;
+
+        if (matchingPosts.length > 0) {
+          out += `<div class="text-sky-400 font-bold text-xs">Articles (${matchingPosts.length}):</div>`;
+          matchingPosts.forEach((p) => {
+            out +=
+              `<div class="border-l-2 border-emerald-500 pl-2 py-0.5 space-y-0.5">` +
+              `<div class="font-bold text-white flex items-center justify-between">` +
+              `<span>📄 ${escapeHtml(p.title)}</span>` +
+              `<span class="text-xs text-neutral-400">${p.date}</span>` +
+              `</div>` +
+              `<div class="text-xs text-neutral-300">${escapeHtml(p.description)}</div>` +
+              `<div class="text-xs flex items-center gap-2 pt-0.5">` +
+              `<button class="cli-cmd-link retro-btn text-[10px] py-0 px-1" data-cmd="cat ${p.id}">cat</button>` +
+              `<button class="cli-cmd-link retro-btn text-[10px] py-0 px-1" data-cmd="open ${p.id}">open</button>` +
+              `</div>` +
+              `</div>`;
+          });
+        }
+
+        if (matchingProjects.length > 0) {
+          out += `<div class="text-yellow-400 font-bold text-xs mt-2">Projects (${matchingProjects.length}):</div>`;
+          matchingProjects.forEach((p) => {
+            out +=
+              `<div class="border-l-2 border-yellow-500 pl-2 py-0.5 space-y-0.5">` +
+              `<div class="font-bold text-white flex items-center justify-between">` +
+              `<span>💾 ${escapeHtml(p.title)}</span>` +
+              `<span class="text-xs text-neutral-400">${p.date}</span>` +
+              `</div>` +
+              `<div class="text-xs text-neutral-300">${escapeHtml(p.description)}</div>` +
+              `<div class="text-xs flex items-center gap-2 pt-0.5">` +
+              `<button class="cli-cmd-link retro-btn text-[10px] py-0 px-1" data-cmd="cat ${p.id}">cat</button>` +
+              `<button class="cli-cmd-link retro-btn text-[10px] py-0 px-1" data-cmd="open ${p.id}">open</button>` +
+              `</div>` +
+              `</div>`;
+          });
+        }
+
+        out += `</div>`;
+        printLine(out);
+      },
+
+      find: (args) => {
+        commands.search(args);
+      },
+
+      grep: (args) => {
+        commands.search(args);
+      },
+
+      theme: (args) => {
+        const currentTheme = localStorage.getItem("theme") || "system";
+        const isDarkNow = document.documentElement.classList.contains("dark");
+        const mode = args[0]?.toLowerCase();
+
+        if (!mode) {
+          printLine(
+            `<span class="text-neutral-300">Current theme setting: <span class="text-yellow-300 font-bold">${currentTheme}</span> ` +
+            `(Active display: <span class="text-sky-300 font-bold">${isDarkNow ? "Dark / Y2K Cyber" : "Light / Classic 2000"}</span>)</span><br/>` +
+            `<span class="text-neutral-400 text-xs">Usage: theme [light | dark | system | toggle]</span>`
+          );
+          return;
+        }
+
+        let newTheme = currentTheme;
+        if (mode === "toggle") {
+          newTheme = isDarkNow ? "light" : "dark";
+        } else if (mode === "light" || mode === "dark" || mode === "system") {
+          newTheme = mode;
+        } else {
+          printLine(`theme: unknown mode '${escapeHtml(mode)}'. Choose from: light, dark, system, toggle`, true);
+          return;
+        }
+
+        localStorage.setItem("theme", newTheme);
+        const shouldBeDark =
+          newTheme === "dark" ||
+          (newTheme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+        document.documentElement.classList.toggle("dark", shouldBeDark);
+
+        // Update footer buttons if present
+        const lightBtn = document.getElementById("light-theme-button");
+        const darkBtn = document.getElementById("dark-theme-button");
+        const systemBtn = document.getElementById("system-theme-button");
+        const updateBtn = (btn, active) => {
+          if (!btn) return;
+          btn.classList.toggle("active", active);
+        };
+        updateBtn(lightBtn, newTheme === "light");
+        updateBtn(darkBtn, newTheme === "dark");
+        updateBtn(systemBtn, newTheme === "system");
+
+        printLine(
+          `<span class="text-emerald-400">✓ Theme changed to <span class="font-bold">${newTheme}</span> ` +
+          `(${shouldBeDark ? "Y2K Cyber Night" : "Classic 2000 Teal/Grey"})</span>`
+        );
+      },
+
+      neofetch: () => {
+        const isDark = document.documentElement.classList.contains("dark");
+        const logo =
+`  <span class="text-sky-400 font-bold">..............</span>          <span class="text-emerald-400 font-bold">nawasan@cyberhome</span>
+            <span class="text-sky-400 font-bold">..,;:ccc,.</span>    <span class="text-neutral-500">-----------------</span>
+          <span class="text-sky-400 font-bold">......''';lxO.</span>  <span class="text-yellow-300">OS:</span> Kali Linux x86_64
+<span class="text-sky-400 font-bold">.....''''..........,:ld;</span>  <span class="text-yellow-300">Host:</span> Nawasan's CyberStation 2000
+           <span class="text-sky-400 font-bold">.';;;:::;,,.</span>   <span class="text-yellow-300">Kernel:</span> 6.12.0-kali-rolling
+      <span class="text-sky-400 font-bold">..'''.</span>              <span class="text-yellow-300">Uptime:</span> 1337 hours, 42 mins
+    <span class="text-sky-400 font-bold">..</span>                    <span class="text-yellow-300">Shell:</span> cyber-sh v2.0
+   <span class="text-sky-400 font-bold">.</span>                      <span class="text-yellow-300">Terminal:</span> MS-DOS Web Console
+                          <span class="text-yellow-300">Theme:</span> ${isDark ? "Y2K Cyber Night" : "Classic 2000 Teal"}
+                          <span class="text-yellow-300">Resolution:</span> 1024x768 (16-bit color)
+                          <span class="text-yellow-300">CPU:</span> Pentium III (Coppermine) @ 800MHz
+                          <span class="text-yellow-300">Memory:</span> 256MB / 512MB
+                          <span class="text-yellow-300">Blog:</span> ${cliData.blog.length} articles published
+                          <span class="text-yellow-300">Projects:</span> ${cliData.projects.length} software packages`;
+
+        printLine(`<pre class="font-mono text-xs sm:text-sm leading-relaxed">${logo}</pre>`);
+      },
+
+      fastfetch: () => {
+        commands.neofetch();
+      },
+
+      fetch: () => {
+        commands.neofetch();
+      },
+
+      whoami: () => {
+        printLine(
+          `<div class="space-y-1">` +
+          `<div><span class="text-emerald-400 font-bold">guest@cyberhome</span> (Visitor Session)</div>` +
+          `<div class="text-neutral-400 text-xs">Host: Nawasan's CyberHome (https://nawasan.dev)</div>` +
+          `<div class="text-neutral-300 text-xs">Webmaster: ณวสันต์ (Nawasan) | ZocketZero</div>` +
+          `<div class="text-neutral-400 text-xs">Type <span class="cli-cmd-link text-yellow-300 underline cursor-pointer" data-cmd="cat about.txt">cat about.txt</span> for biography.</div>` +
+          `</div>`
+        );
+      },
+
+      socials: () => {
+        let out =
+`<div class="space-y-1">
+  <div class="text-yellow-300 font-bold">SOCIAL NETWORKS & LINKS:</div>`;
+        cliData.socials.forEach((s) => {
+          out +=
+            `<div class="flex items-center gap-2">` +
+            `<span class="text-sky-400 font-semibold">• ${escapeHtml(s.NAME)}:</span> ` +
+            `<a href="${s.HREF}" target="_blank" class="text-emerald-400 underline">${escapeHtml(s.HREF)}</a>` +
+            `</div>`;
+        });
+        out +=
+          `<div class="flex items-center gap-2">` +
+          `<span class="text-sky-400 font-semibold">• Email:</span> ` +
+          `<a href="mailto:${cliData.site.EMAIL}" class="text-emerald-400 underline">${cliData.site.EMAIL}</a>` +
+          `</div></div>`;
+        printLine(out);
+      },
+
+      contact: () => {
+        commands.cat(["contact.txt"]);
+      },
+
+      date: () => {
+        const now = new Date();
+        printLine(`<span class="text-neutral-200 font-mono">${now.toString()}</span>`);
+      },
+
+      ping: (args) => {
+        let host = "nawasan.dev";
+        let count = 4;
+
+        for (let i = 0; i < args.length; i++) {
+          if (args[i] === "-c" && args[i + 1]) {
+            count = Math.max(1, Math.min(10, parseInt(args[i + 1], 10) || 4));
+            i++;
+          } else if (!args[i].startsWith("-")) {
+            host = args[i];
+          }
+        }
+
+        const cleanHost = host.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+
+        const ipMap = {
+          localhost: "127.0.0.1",
+          "127.0.0.1": "127.0.0.1",
+          "nawasan.dev": "185.199.108.153",
+          "www.nawasan.dev": "185.199.108.153",
+          "google.com": "142.250.190.46",
+          "kali.org": "192.124.249.10",
+          "github.com": "140.82.121.4",
+        };
+
+        let ip = ipMap[cleanHost.toLowerCase()];
+        if (!ip) {
+          let hash = 0;
+          for (let i = 0; i < cleanHost.length; i++) {
+            hash = (hash * 31 + cleanHost.charCodeAt(i)) & 0xffffffff;
+          }
+          const o1 = 100 + (Math.abs(hash) % 100);
+          const o2 = Math.abs(hash >> 8) % 250;
+          const o3 = Math.abs(hash >> 16) % 250;
+          const o4 = 1 + (Math.abs(hash >> 24) % 254);
+          ip = `${o1}.${o2}.${o3}.${o4}`;
+        }
+
+        const isLocal = cleanHost === "localhost" || cleanHost === "127.0.0.1";
+        const baseLatency = isLocal ? 0.04 : (cleanHost.includes("nawasan.dev") ? 14 : 28);
+        const ttl = isLocal ? 64 : 56;
+
+        printLine(`PING ${escapeHtml(cleanHost)} (${ip}): 56 data bytes`);
+
+        const latencies = [];
+        let seq = 1;
+
+        if (window.__CLI_PING_INTERVAL__) {
+          clearInterval(window.__CLI_PING_INTERVAL__);
+          window.__CLI_PING_INTERVAL__ = null;
+        }
+
+        window.__CLI_PING_INTERVAL__ = setInterval(() => {
+          if (seq > count) {
+            clearInterval(window.__CLI_PING_INTERVAL__);
+            window.__CLI_PING_INTERVAL__ = null;
+
+            const min = Math.min(...latencies).toFixed(isLocal ? 3 : 1);
+            const max = Math.max(...latencies).toFixed(isLocal ? 3 : 1);
+            const avg = (latencies.reduce((a, b) => a + b, 0) / latencies.length).toFixed(isLocal ? 3 : 1);
+
+            const stats =
+`<div class="mt-1 text-xs">
+  <div class="text-neutral-400">--- ${escapeHtml(cleanHost)} ping statistics ---</div>
+  <div>${count} packets transmitted, ${count} packets received, <span class="text-emerald-400">0.0% packet loss</span></div>
+  <div>round-trip min/avg/max = <span class="text-yellow-300">${min}</span>/<span class="text-yellow-300">${avg}</span>/<span class="text-yellow-300">${max}</span> ms</div>
+</div>`;
+            printLine(stats);
+            return;
+          }
+
+          const jitter = (Math.random() * 3.0 - 1.5);
+          const lat = isLocal
+            ? parseFloat((baseLatency + Math.random() * 0.012).toFixed(3))
+            : parseFloat(Math.max(1, baseLatency + jitter).toFixed(1));
+          latencies.push(lat);
+
+          printLine(
+            `64 bytes from ${ip}: icmp_seq=${seq} ttl=${ttl} time=${lat} ms`
+          );
+
+          seq++;
+        }, 350);
+      },
+
+      clear: () => {
+        const output = document.getElementById("cli-output");
+        if (output) output.innerHTML = "";
+      },
+
+      cls: () => {
+        commands.clear();
+      },
+
+      history: () => {
+        if (commandHistory.length === 0) {
+          printLine(`<span class="text-neutral-400">No commands in history.</span>`);
+          return;
+        }
+        let out = `<div class="space-y-0.5 text-neutral-300"><div class="text-yellow-300 font-bold">COMMAND HISTORY:</div>`;
+        commandHistory.forEach((cmd, idx) => {
+          out += `<div><span class="text-neutral-500 w-6 inline-block">${idx + 1}</span> <span class="cli-cmd-link text-emerald-300 cursor-pointer underline" data-cmd="${escapeHtml(cmd)}">${escapeHtml(cmd)}</span></div>`;
+        });
+        out += `</div>`;
+        printLine(out);
+      },
+
+      echo: (args) => {
+        printLine(`<span class="text-neutral-200">${escapeHtml(args.join(" "))}</span>`);
+      },
+
+      exit: () => {
+        closeCli();
+      },
+
+      quit: () => {
+        closeCli();
+      },
+
+      matrix: () => {
+        printLine(`<span class="text-emerald-400 font-bold">Wake up, Neo... The Matrix has you.</span>`);
+        const characters = "01アイウエオカキクケコサシスセソタチツテト0123456789";
+        for (let i = 0; i < 6; i++) {
+          setTimeout(() => {
+            let row = "";
+            for (let j = 0; j < 40; j++) {
+              row += characters.charAt(Math.floor(Math.random() * characters.length)) + " ";
+            }
+            printLine(`<span class="text-emerald-500 text-xs font-mono select-none">${row}</span>`);
+          }, i * 150);
+        }
+      },
+
+      cowsay: (args) => {
+        const msg = args.length > 0 ? args.join(" ") : "Welcome to Nawasan's Website!";
+        const cow =
+` -----------------------------
+&lt; ${escapeHtml(msg)} &gt;
+ -----------------------------
+        \\   ^__^
+         \\  (oo)\\_______
+            (__)\\       )\\/\\
+                ||----w |
+                ||     ||`;
+        printLine(`<pre class="text-yellow-200 font-mono text-xs">${cow}</pre>`);
+      },
+
+      fortune: () => {
+        const quotes = [
+          "There is no place like ~/",
+          "The quieter you become, the more you are able to hear. (Kali Linux motto)",
+          "Real programmers count from 0.",
+          "It compiles! Ship it to production on Friday at 5 PM.",
+          "In a world without fences and walls, who needs Gates and Windows?",
+          "Simplicity is prerequisite for reliability. - Edsger W. Dijkstra",
+          "There are 10 types of people in the world: those who understand binary, and those who don't."
+        ];
+        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        printLine(`<div class="border-l-2 border-yellow-400 pl-2 text-yellow-200 italic font-mono">"${randomQuote}"</div>`);
+      },
+
+      sudo: (args) => {
+        const attempted = args.length > 0 ? args.join(" ") : "command";
+        printLine(
+          `<span class="text-red-400 font-bold">[sudo] password for guest:</span><br/>` +
+          `<span class="text-red-400 font-bold">Permission denied:</span> cannot execute '${escapeHtml(attempted)}'. ` +
+          `guest is not in the sudoers file. This incident will be reported to the Cybermaster.`,
+          true
+        );
+      }
+    };
+
+    const commandHelpDetails = {
+      cd: `<div class="text-neutral-300"><span class="text-yellow-300 font-bold">cd &lt;dir&gt;</span>: Changes virtual directory. Use 'cd blog', 'cd projects', 'cd tags', 'cd ~', or 'cd ..'. Add '-g' flag to navigate in browser.</div>`,
+      ls: `<div class="text-neutral-300"><span class="text-yellow-300 font-bold">ls [-l] [dir]</span>: Lists files and subfolders in current or specified folder.</div>`,
+      cat: `<div class="text-neutral-300"><span class="text-yellow-300 font-bold">cat &lt;file&gt;</span>: Shows the preview or content of any text file, blog post, or project.</div>`,
+      open: `<div class="text-neutral-300"><span class="text-yellow-300 font-bold">open &lt;target&gt;</span>: Navigates the browser to a page (home, blog, projects, tags, post id, or project id).</div>`,
+      ping: `<div class="text-neutral-300"><span class="text-yellow-300 font-bold">ping &lt;host&gt; [-c count]</span>: Tests network round-trip latency by sending ICMP ECHO_REQUEST packets. Defaults to nawasan.dev.</div>`,
+      theme: `<div class="text-neutral-300"><span class="text-yellow-300 font-bold">theme &lt;light|dark|system|toggle&gt;</span>: Changes or toggles website appearance.</div>`
+    };
+
+    // Execute input command
+    function executeCommand(rawInput) {
+      const trimmed = rawInput.trim();
+      if (!trimmed) {
+        printLine(
+          `<div class="flex items-center gap-1.5 text-neutral-400 select-none">` +
+          `<span class="text-emerald-400 font-bold">nawasan@cyberhome:</span>` +
+          `<span class="text-sky-400">${escapeHtml(cwd)}</span>$&nbsp;` +
+          `</div>`
+        );
+        return;
+      }
+
+      printCommandHeader(trimmed);
+      commandHistory.push(trimmed);
+      historyIndex = commandHistory.length;
+
+      const tokens = trimmed.split(/\s+/);
+      const cmd = tokens[0].toLowerCase();
+      const args = tokens.slice(1);
+
+      if (commands[cmd]) {
+        try {
+          commands[cmd](args);
+        } catch (err) {
+          printLine(`Execution error: ${err.message}`, true);
+        }
+      } else {
+        printLine(
+          `Command not found: '${escapeHtml(cmd)}'. Type <span class="cli-cmd-link text-yellow-300 underline cursor-pointer" data-cmd="help">help</span> for a list of valid commands.`,
+          true
+        );
+      }
+    }
+
+    // Auto-complete (Tab) logic
+    function handleAutocomplete(inputEl) {
+      const currentVal = inputEl.value;
+      const cursor = inputEl.selectionStart;
+      const beforeCursor = currentVal.slice(0, cursor);
+
+      const parts = beforeCursor.trimStart().split(/\s+/);
+      const isCommand = parts.length <= 1;
+
+      const allCommandNames = Object.keys(commands);
+
+      if (isCommand) {
+        const prefix = parts[0]?.toLowerCase() || "";
+        const matches = allCommandNames.filter((c) => c.startsWith(prefix));
+
+        if (matches.length === 1) {
+          inputEl.value = matches[0] + " ";
+          inputEl.setSelectionRange(inputEl.value.length, inputEl.value.length);
+        } else if (matches.length > 1) {
+          printCommandHeader(currentVal);
+          printLine(`<div class="text-neutral-400 text-xs">${matches.join("    ")}</div>`);
+        }
+        return;
+      }
+
+      // Autocomplete arguments
+      const cmd = parts[0].toLowerCase();
+      const argPrefix = parts[parts.length - 1]?.toLowerCase() || "";
+
+      let candidateOptions = [];
+
+      if (cmd === "cd") {
+        candidateOptions = ["~", "blog", "projects", "tags", ".."];
+      } else if (cmd === "cat" || cmd === "show" || cmd === "view") {
+        if (cwd === "~") {
+          candidateOptions = [
+            "about.txt", "contact.txt", "skills.txt", "readme.txt",
+            ...cliData.blog.map((b) => b.id),
+            ...cliData.projects.map((p) => p.id)
+          ];
+        } else if (cwd === "~/blog") {
+          candidateOptions = cliData.blog.map((b) => b.id);
+        } else if (cwd === "~/projects") {
+          candidateOptions = cliData.projects.map((p) => p.id);
+        }
+      } else if (cmd === "open" || cmd === "goto" || cmd === "navigate") {
+        candidateOptions = [
+          "home", "blog", "projects", "tags", "rss", "github", "linkedin",
+          ...cliData.blog.map((b) => b.id),
+          ...cliData.projects.map((p) => p.id)
+        ];
+      } else if (cmd === "theme") {
+        candidateOptions = ["light", "dark", "system", "toggle"];
+      } else if (cmd === "ping") {
+        candidateOptions = ["nawasan.dev", "localhost", "127.0.0.1", "google.com", "kali.org", "github.com"];
+      }
+
+      const matches = candidateOptions.filter((opt) => opt.toLowerCase().startsWith(argPrefix));
+
+      if (matches.length === 1) {
+        parts[parts.length - 1] = matches[0];
+        inputEl.value = parts.join(" ") + " ";
+        inputEl.setSelectionRange(inputEl.value.length, inputEl.value.length);
+      } else if (matches.length > 1) {
+        printCommandHeader(currentVal);
+        printLine(`<div class="text-neutral-400 text-xs">${matches.join("    ")}</div>`);
+      }
+    }
+
+    // Event Listeners: Click delegation for all trigger buttons & links
+    document.addEventListener("click", (e) => {
+      const target = e.target;
+      if (!(target instanceof Element)) return;
+
+      // Trigger buttons
+      if (
+        target.closest("#cli-trigger-btn") ||
+        target.closest("#status-terminal-btn") ||
+        target.closest("#menu-terminal-btn") ||
+        target.closest("#cli-restore-btn")
+      ) {
+        e.preventDefault();
+        openCli();
+        return;
+      }
+
+      // Close button
+      if (target.closest("#cli-close-btn")) {
+        e.preventDefault();
+        closeCli();
+        return;
+      }
+
+      // Minimize button
+      if (target.closest("#cli-min-btn")) {
+        e.preventDefault();
+        minimizeCli();
+        return;
+      }
+
+      // Maximize button
+      if (target.closest("#cli-max-btn")) {
+        e.preventDefault();
+        toggleMaximizeCli();
+        return;
+      }
+
+      // Backdrop click closes
+      const backdrop = document.getElementById("cli-backdrop");
+      if (backdrop && target === backdrop) {
+        closeCli();
+        return;
+      }
+
+      // Quick toolbar buttons or in-terminal clickable command links
+      const cmdBtn = target.closest(".cli-cmd-link, .cli-quick-btn");
+      if (cmdBtn) {
+        const cmdToRun = cmdBtn.getAttribute("data-cmd");
+        if (cmdToRun) {
+          const input = document.getElementById("cli-input");
+          if (input) input.value = cmdToRun;
+          executeCommand(cmdToRun);
+          if (input) input.value = "";
+          const screen = document.getElementById("cli-screen");
+          if (screen) screen.scrollTop = screen.scrollHeight;
+          input?.focus();
+        }
+        return;
+      }
+
+      // Clicking anywhere on terminal screen focuses input
+      if (target.closest("#cli-screen") && !target.closest("button, a")) {
+        document.getElementById("cli-input")?.focus();
+      }
+    });
+
+    // Keyboard Shortcuts & Input Navigation
+    document.addEventListener("keydown", (e) => {
+      const modal = document.getElementById("cli-modal");
+      const isCliOpen = modal && !modal.classList.contains("hidden");
+
+      const activeEl = document.activeElement;
+      const isGeneralInput =
+        activeEl instanceof HTMLInputElement ||
+        activeEl instanceof HTMLTextAreaElement ||
+        (activeEl instanceof HTMLElement && activeEl.isContentEditable);
+
+      const isCliInput = activeEl && activeEl.id === "cli-input";
+
+      // Global hotkey: ` (backtick) or Ctrl+` or ~ to toggle CLI
+      if (
+        (e.key === "`" && !isGeneralInput) ||
+        ((e.ctrlKey || e.metaKey) && e.key === "`") ||
+        (e.key === "~" && !isGeneralInput)
+      ) {
+        e.preventDefault();
+        if (isCliOpen) {
+          closeCli();
+        } else {
+          openCli();
+        }
+        return;
+      }
+
+      // Escape key closes modal if open
+      if (e.key === "Escape" && isCliOpen) {
+        e.preventDefault();
+        closeCli();
+        return;
+      }
+
+      // Handle CLI input key actions
+      if (isCliOpen && isCliInput) {
+        const input = document.getElementById("cli-input");
+        if (!input) return;
+
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const val = input.value;
+          input.value = "";
+          executeCommand(val);
+        } else if (e.key === "Tab") {
+          e.preventDefault();
+          handleAutocomplete(input);
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          if (commandHistory.length === 0) return;
+          if (historyIndex === commandHistory.length) {
+            tempDraftInput = input.value;
+          }
+          if (historyIndex > 0) {
+            historyIndex--;
+            input.value = commandHistory[historyIndex];
+            input.setSelectionRange(input.value.length, input.value.length);
+          }
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault();
+          if (commandHistory.length === 0) return;
+          if (historyIndex < commandHistory.length - 1) {
+            historyIndex++;
+            input.value = commandHistory[historyIndex];
+            input.setSelectionRange(input.value.length, input.value.length);
+          } else if (historyIndex === commandHistory.length - 1) {
+            historyIndex = commandHistory.length;
+            input.value = tempDraftInput;
+            input.setSelectionRange(input.value.length, input.value.length);
+          }
+        } else if (e.ctrlKey && e.key.toLowerCase() === "l") {
+          // Ctrl+L clears output
+          e.preventDefault();
+          commands.clear();
+        } else if (e.ctrlKey && e.key.toLowerCase() === "c") {
+          // Ctrl+C cancels current line or active process
+          e.preventDefault();
+          if (window.__CLI_PING_INTERVAL__) {
+            clearInterval(window.__CLI_PING_INTERVAL__);
+            window.__CLI_PING_INTERVAL__ = null;
+            printLine(`<span class="text-neutral-400">--- ping aborted by user (^C) ---</span>`);
+          }
+          printCommandHeader(input.value + "^C");
+          input.value = "";
+        }
+      }
+    });
+
+    // Make window draggable via titlebar
+    (function makeDraggable() {
+      const titlebar = document.getElementById("cli-titlebar");
+      const win = document.getElementById("cli-window");
+      if (!titlebar || !win) return;
+
+      let isDragging = false;
+      let startX = 0, startY = 0;
+      let initialLeft = 0, initialTop = 0;
+
+      titlebar.addEventListener("mousedown", (e) => {
+        if (isMaximized) return;
+        if (e.target.closest("button")) return;
+
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+
+        const rect = win.getBoundingClientRect();
+        initialLeft = rect.left;
+        initialTop = rect.top;
+
+        win.style.position = "fixed";
+        win.style.left = `${initialLeft}px`;
+        win.style.top = `${initialTop}px`;
+        win.style.margin = "0";
+
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+      });
+
+      function onMouseMove(e) {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        win.style.left = `${Math.max(10, Math.min(window.innerWidth - 100, initialLeft + dx))}px`;
+        win.style.top = `${Math.max(10, Math.min(window.innerHeight - 80, initialTop + dy))}px`;
+      }
+
+      function onMouseUp() {
+        isDragging = false;
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+      }
+    })();
+  })();
+</script>
+
+<style is:global>
+  /* Custom scrollbar for terminal screen */
+  #cli-screen::-webkit-scrollbar {
+    width: 10px;
+  }
+  #cli-screen::-webkit-scrollbar-track {
+    background: #090d16;
+  }
+  #cli-screen::-webkit-scrollbar-thumb {
+    background: #25334d;
+    border: 1px solid #475569;
+  }
+  #cli-screen::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+  }
+</style>

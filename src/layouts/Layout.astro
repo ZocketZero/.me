@@ -3,6 +3,7 @@ import Head from "@components/Head.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import Pagefind from "@components/PageFind.astro";
+import CliTerminal from "@components/CliTerminal.astro";
 import { SITE } from "@consts";
 
 type Props = {
@@ -36,13 +37,14 @@ const { title, description } = Astro.props;
           </div>
         </div>
 
-        <!-- Classic Menu Bar: File, Edit, View, Favorites, Tools, Help -->
+        <!-- Classic Menu Bar: File, Edit, View, Favorites, Tools, Terminal, Help -->
         <div class="hidden sm:flex items-center gap-3 px-2 py-0.5 text-xs bg-[#d4d0c8] dark:bg-[#1a2234] border-b border-[#808080] select-none text-neutral-800 dark:text-neutral-200">
           <span class="hover:underline cursor-pointer"><span class="underline">F</span>ile</span>
           <span class="hover:underline cursor-pointer"><span class="underline">E</span>dit</span>
           <span class="hover:underline cursor-pointer"><span class="underline">V</span>iew</span>
           <span class="hover:underline cursor-pointer">Fa<span class="underline">v</span>orites</span>
           <span class="hover:underline cursor-pointer"><span class="underline">T</span>ools</span>
+          <span id="menu-terminal-btn" class="hover:underline cursor-pointer text-emerald-800 dark:text-emerald-400 font-bold">&gt;_ <span class="underline">C</span>LI</span>
           <span class="hover:underline cursor-pointer"><span class="underline">H</span>elp</span>
         </div>
 
@@ -76,6 +78,14 @@ const { title, description } = Astro.props;
             <span class="hidden sm:inline">Internet Zone | Protected Mode: Off</span>
           </div>
           <div class="flex items-center gap-2 shrink-0">
+            <button
+              id="status-terminal-btn"
+              class="retro-bevel-inset px-1.5 py-0.5 bg-white/50 dark:bg-black/30 font-mono text-[11px] text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/50 cursor-pointer flex items-center gap-1"
+              title="Open CLI Terminal (Ctrl+`)"
+            >
+              <span>&gt;_</span>
+              <span>CLI Prompt</span>
+            </button>
             <span class="retro-bevel-inset px-1.5 py-0.5 bg-white/50 dark:bg-black/30 font-pixel text-xs text-emerald-700 dark:text-emerald-400 font-bold blink">
               ● 56.6k DIAL-UP
             </span>
@@ -84,5 +94,6 @@ const { title, description } = Astro.props;
       </div>
     </div>
     <Pagefind />
+    <CliTerminal />
   </body>
 </html>

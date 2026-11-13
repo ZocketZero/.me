@@ -46,27 +46,40 @@ import { SITE } from "@consts";
       </a>
     </nav>
 
-    <!-- Search Button (Keeps #magnifying-glass ID for Pagefind modal) -->
-    <button
-      id="magnifying-glass"
-      aria-label="Search"
-      class="retro-btn font-mono text-xs flex items-center gap-1.5 bg-[#e8e4dc] dark:bg-[#0f172a]"
-      title="Search (Hotkey: / or Ctrl+K)"
-    >
-      <svg
-        height="14"
-        stroke-linejoin="round"
-        viewBox="0 0 16 16"
-        width="14"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
+    <div class="flex items-center gap-1.5">
+      <!-- CLI Terminal Button -->
+      <button
+        id="cli-trigger-btn"
+        aria-label="Open CLI Terminal"
+        class="retro-btn font-mono text-xs flex items-center gap-1.5 bg-[#e8e4dc] dark:bg-[#0f172a] text-emerald-800 dark:text-emerald-400 font-bold"
+        title="Open CLI Terminal (Hotkey: ` or Ctrl+`)"
       >
-        <circle cx="7" cy="7" r="5" />
-        <path d="M11 11L15 15" stroke-linecap="round" />
-      </svg>
-      <span>Find (Ctrl+K)</span>
-    </button>
+        <span class="text-xs">&gt;_</span>
+        <span>CLI (Ctrl+`)</span>
+      </button>
+
+      <!-- Search Button (Keeps #magnifying-glass ID for Pagefind modal) -->
+      <button
+        id="magnifying-glass"
+        aria-label="Search"
+        class="retro-btn font-mono text-xs flex items-center gap-1.5 bg-[#e8e4dc] dark:bg-[#0f172a]"
+        title="Search (Hotkey: / or Ctrl+K)"
+      >
+        <svg
+          height="14"
+          stroke-linejoin="round"
+          viewBox="0 0 16 16"
+          width="14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="7" cy="7" r="5" />
+          <path d="M11 11L15 15" stroke-linecap="round" />
+        </svg>
+        <span>Find (Ctrl+K)</span>
+      </button>
+    </div>
   </div>
 
   <!-- Classic Running Marquee Ticker -->
